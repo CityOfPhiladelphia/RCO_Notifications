@@ -1,0 +1,356 @@
+/* FONTS */
+
+@font-face {
+    font-family: 'Steelfish';
+    src: url('fonts/steelfish-webfont.eot');
+    src: url('fonts/steelfish-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/steelfish-webfont.woff') format('woff'), url('fonts/steelfish-webfont.ttf') format('truetype'), url('fonts/steelfish-webfont.svg#steelfish_rgregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/* Splash Screen */
+#splashHeader {
+    background-color: #2176D2;
+    color: #ffffff;
+    padding: 3px 3px 3px 3px
+}
+
+#splashScreen {
+    background-color: rgba(255, 255, 255, 0.95);
+    position: absolute;
+    left: 20%;
+    top: 20%;
+    right: 20%;
+    height: auto;
+    width: auto;
+    z-index: 10;
+    padding: 0px 20px 20px 20px;
+    border: solid;
+    display: none;
+}
+
+#splashDontShow {
+    background-color: #2176D2;
+    width: 175px;
+}
+
+#doNotShowSplashLabel {
+    color: white;
+}
+
+.splashList {
+    list-style-position: inside;
+}
+
+@media screen and (max-width: 480px) {
+    #splashScreen {
+        width: auto;
+        height: 450px;
+        left: 0;
+        top: 8px;
+        overflow-y: scroll;
+        z-index: 100;
+    }
+}
+
+
+
+
+/* footer override */
+.esri-attribution__sources {
+    display: none;
+}
+
+/* PHILLY */
+
+footer.site-footer {
+    margin-top: 0;
+}
+
+.dropdown-pane.is-open {
+    width: auto !important;
+    position: absolute !important;
+    left: auto !important;
+}
+
+    .dropdown-pane.is-open a {
+        text-align: left !important;
+    }
+
+
+.PCPC-Logo {
+    width: 100px !important;
+    max-width: 100px !important;
+    height: auto !important;
+    margin-bottom: 5px !important;
+}
+
+img.center {
+    display: block;
+    margin: 0 auto;
+}
+
+/* BROWSER */
+
+:focus {
+    outline: none;
+}
+
+input:focus {
+    border: none !important;
+}
+
+/* API */
+
+.esri-search .esri-search__container {
+    height: 32px;
+}
+
+    .esri-search .esri-search__container .esri-widget-button {
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+    }
+
+/* MAP */
+
+@keyframes pulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.00);
+    }
+
+    1% {
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(7);
+    }
+}
+
+/* UI */
+
+#panelContent {
+    position: relative;
+    width: 100%;
+    height: 700px;
+    display: block;
+}
+
+#panelMap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+}
+
+#panelUI {
+    position: absolute;
+    top: 15px;
+    width: 100%;
+    height: 0px;
+    overflow: visible;
+}
+
+#panelInner {
+    max-width: 75rem;
+    height: 0px;
+    overflow: visible;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#panelBox {
+    width: 350px;
+    height: auto;
+    margin-left: 10px;
+    display: block;
+    /*background-color: rgba(37, 206, 247, 0.7);*/
+    background-color: rgba(255, 255, 255, 0.85);
+    box-sizing: border-box;
+    padding: 10px;
+    color: #444444;
+    font-family: 'Montserrat', 'Tahoma', sans-serif;
+    font-size: 12px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.shadow {
+    -webkit-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3);
+    box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.3);
+}
+
+#boxTitle {
+    height: 50px;
+    line-height: 18px;
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#btnAbout {
+    float: right;
+    width: 48px;
+    height: 24px;
+    margin: 3px;
+    background-color: #2176D2;
+    color: #ffffff;
+    text-align: center;
+    line-height: 24px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 2px #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#boxNotify {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#boxSearch {
+    width: 100%;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#boxResults {
+    width: 325px;
+    height: 0px;
+    display: block;
+    overflow: hidden;
+    margin-top: 0px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.boxRow {
+    width: 100%;
+    line-height: 11px;
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0px;
+}
+
+.fld {
+    font-weight: 600;
+}
+
+#boxResults.opened {
+    height: 300px;
+    margin-top: 10px;
+}
+
+#boxNum {
+    height: 96px;
+    line-height: 96px;
+    font-size: 90px;
+    text-align: center;
+    font-family: 'Steelfish';
+}
+
+#boxLabel {
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+
+#boxDownload {
+    clear: both;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    display: block;
+}
+
+.btn {
+    width: 200px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #000000;
+    color: #ffffff;
+    cursor: pointer;
+    margin: 10px auto 10px auto;
+}
+
+
+#btnMax {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: 600;
+    display: none;
+}
+
+#boxAbout {
+    width: 280px;
+    height: 250px;
+    display: none;
+    overflow: auto;
+}
+
+@media screen and (max-width: 480px) {
+
+    #panelContent {
+        height: 480px;
+    }
+
+    #panelBox {
+        width: 375px;
+    }
+
+    #boxTitle {
+        height: 40px;
+    }
+
+    #btnAbout {
+        float: right;
+        width: 48px;
+        height: 24px;
+        margin: 3px;
+        background-color: #2176D2;
+        color: #ffffff;
+        text-align: center;
+        line-height: 24px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        box-shadow: 1px 1px 2px #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+
+    #boxResults.opened {
+        height: 300px;
+    }
+
+    #boxLabel {
+        float: left;
+        width: 230px;
+        height: 30px;
+        line-height: 30px;
+        text-align: left;
+    }
+}
+
+/* Header */
+nav ul.horizontal.menu.pan li a {
+    font-weight: bold;
+}

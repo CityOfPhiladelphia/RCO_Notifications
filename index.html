@@ -1,0 +1,323 @@
+﻿<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RCO Notifications | City Of Philadelphia</title>
+    <link rel="stylesheet" type="text/css" href="phila-standards/css/phila-standards.min.css">
+    <link rel="stylesheet" href="//js.arcgis.com/4.10/esri/css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="shortcut icon" type="image/x-icon" href="phila-standards/img/favicon.png">
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Digital Standards | City of Philadelphia">
+    <meta property="og:image" content="https://beta.phila.gov/media/20160715133810/phila-gov.jpg">
+</head>
+<body lang="en">
+    <header class="global-nav pbm pbn-mu mbn-mu">
+        <h1 class="accessible">City of Philadelphia</h1>
+        <div class="row columns bg-ben-franklin-blue expanded utility-nav" data-swiftype-index="false">
+            <div class="row">
+                <div class="medium-24 columns float-right">
+                    <ul class="medium-horizontal menu show-for-medium float-right">
+                        <li><a href="https://beta.phila.gov/departments/mayor/">Mayor's Office</a></li>
+                        <li><a href="https://beta.phila.gov/departments/">City government directory</a></li>
+                        <li>
+                            <div id="google_translate_element" class="no-js"><span class="show-for-sr">Google Translate</span></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-24 columns">
+                <div class="row primary-menu" data-sticky-container data-swiftype-index="false">
+                    <div class="columns sticky phn" data-margin-top="0" data-sticky data-sticky-on="medium">
+                        <div class="row sticky-header-width">
+                            <div class="small-15 medium-5 columns small-push-4 medium-push-0">
+                                <a href="https://beta.phila.gov" class="logo" tabindex="1" aria-label="City of Philadelphia">
+                                    <img src="//standards.phila.gov/img/logo/city-of-philadelphia.svg" data-fallback="//standards.phila.gov/img/logo/city-of-philadelphia.png" alt="City of Philadelphia">
+                                </a>
+                            </div>
+                            <a href="#page" aria-hidden="false" class="accessible">Skip to main content</a>
+                            <div class="medium-19 columns show-for-medium desktop-nav">
+                                <div class="top-bar-right">
+                                    <nav data-swiftype-index="false">
+                                        <ul class="horizontal menu pan">
+                                            <li>
+                                                <a href="#" data-toggle="lnkInstruction">Instructions</a>
+                                                <div class="dropdown-pane" id="lnkInstruction" data-dropdown data-hover="true" data-hover-pane="true">
+                                                    <ul class="vertical menu pan">
+                                                        <li>
+                                                            <a href="#">Detailed Instructions</a>
+                                                            <ul class="nested vertical menu">
+                                                                <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/Applicant_Detailed_Instructions.pdf" target="_blank">> For Applicants</a></li>
+                                                                <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/RCO_Detailed_Instructions.pdf" target="_blank">> For RCOs</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/APPLICANT_NOTIFICATION_TEMPLATES.pdf" target="_blank">Template for Applicants</a></li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/Meeting_Summary_Template.pdf" target="_blank">Meeting Summary Form for RCOs</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="#" data-toggle="lnkContactLists">Contact Lists</a>
+                                                <div class="small dropdown-pane" id="lnkContactLists" data-dropdown data-hover="true" data-hover-pane="true">
+                                                    <ul class="vertical menu pan">
+                                                        <!-- TODO: Council Contact list -->
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/District_Council_RCO_Contacts.pdf" target="_blank">Council Contacts</a></li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/List_of_RCOs.pdf" target="_blank">List of RCOs</a></li>
+                                                        <li><a href="https://openmaps.phila.gov/" target="_blank">Map of RCOs</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="#" data-toggle="lnkLegislation">Legislation &amp; Regulation</a>
+                                                <div class="small dropdown-pane" id="lnkLegislation" data-dropdown data-hover="true" data-hover-pane="true">
+                                                    <ul class="vertical menu pan">
+                                                        <li><a href="//library.amlegal.com/nxt/gateway.dll/Pennsylvania/philadelphia_pa/title14zoningandplanning/chapter14-300administrationandprocedures?f=templates$fn=default.htm$3.0$vid=amlegal:philadelphia_pa$anc=JD_14-303(11A)" target="_blank">Philadelphia City Code (§ 14-303, Subsections (11A) and (12))</a></li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/Regulations%20PDF/PCPC_Regulations_As_Amended_June272016.pdf" target="_blank">PCPC Regulations (Section 12)</a></li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/Applicant%20Rights%20and%20Responsibilities.pdf" target="_blank">Applicant Rights and Responsibilities</a></li>
+                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/RCO%20Rights%20and%20Resposibilities.pdf" target="_blank">RCO Rights and Responsibilities</a></li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="top-bar">
+                            <div class="title-bar small-5 columns" data-responsive-toggle="mobile-nav" data-swiftype-index="false" data-hide-for="medium">
+                                <button class="menu-icon" type="button" data-toggle>
+                                    <i class="fa fa-bars fa-3x" aria-hidden="true"></i>
+                                    <span class="title-bar-title">Menu</span>
+                                </button>
+                            </div>
+                            <div class="primary-menu medium-15 medium-push-2 small-24 columns equal valign-mu" id="mobile-nav">
+                                <div class="top-bar-right valign-mu show-for-small-only">
+                                    <nav data-swiftype-index="false" class="valign-mu">
+                                        <ul id="mobile-nav-drilldown" class="vertical menu pan valign-mu">
+                                            <li>
+                                                <a href="https://beta.phila.gov"><i class="fa fa-home fa-lg"></i> Phila.gov home</a>
+                                            </li>
+                                            <li>
+                                                <a href="https://beta.phila.gov/services" class="valign-cell"><i class="fa fa-list show-for-small-only"></i> Service directory</a>
+                                            </li>
+                                            <li>
+                                                <a href="https://beta.phila.gov/programs-initiatives/" class="valign-cell"><i class="fa fa-info-circle"></i> Programs & initiatives</a>
+                                            </li>
+                                            <li>
+                                                <a href="https://beta.phila.gov/news/" class="valign-cell"><i class="fa fa-microphone"></i> News & events</a>
+                                            </li>
+                                            <li>
+                                                <a href="https://beta.phila.gov/documents/" class="valign-cell"><i class="fa fa-file-text"></i> Publications & forms</a>
+                                            </li>
+                                            <li class="bg-sidewalk">
+                                                <a href="https://beta.phila.gov/mayor/"><i class="fa fa-university"></i> Mayor's Office</a>
+                                            </li>
+                                            <li class="bg-sidewalk">
+                                                <a href="https://beta.phila.gov/departments/"><i class="fa fa-sitemap"></i> City government directory</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ******** -->
+    <!-- ESRI APP -->
+    <div id="page">
+        <div id="panelContent">
+
+            <!-- Splash Screen -->
+            <div id="splashScreen">
+                <h2 id="splashHeader">Information (Click To Dismiss)</h2>
+                <div>
+                    The Philadelphia Zoning Code includes provisions to ensure that neighbors of proposed developments are notified and have an opportunity to provide input regarding zoning decisions that may impact them. This is accomplished through a system of notification and through notification to near neighbors and public meetings that are held in communities and convened by Registered Community Organizations (RCOs).<br /><br />
+                    This website is a tool to assist applicants with their Zoning Board of Adjustment (ZBA) community notification process as well as giving more information to community members and interested residents.
+                    <br />
+                    This tool provides four pieces of information:
+                    <ol class="splashList">
+                        <li>Addresses of near neighbors that need to be notified.</li>
+                        <li>Names and contact information for RCOs.</li>
+                        <li>Contact information for other entities, such as the local Council District, Zoning Board of Adjustment (ZBA) and Philadelphia City Planning Commission (PCPC) that need to be notified through this process.</li>
+                        <li>Templates for documents that applicants and RCOs are to use throughout this process.</li>
+                    </ol>
+                    To complete the notification process per
+                    <a class="clickable" href="//library.amlegal.com/nxt/gateway.dll/Pennsylvania/philadelphia_pa/title14zoningandplanning/chapter14-300administrationandprocedures?f=templates$fn=default.htm$3.0$vid=amlegal:philadelphia_pa$anc=JD_14-303(11A)" target="_blank"> Section 14-303(12) of the Philadelphia Code</a>,
+                    read the detailed instructions <a class="clickable" href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/RCO_Detailed_Instructions.pdf" target="_blank">here</a>, then click through to the map.
+                    To see these instructions again, click the “info” icon at the top right of the search box.
+                    <br /><br />
+                    For questions or comments, email <a class="clickable" href="mailto:RCO.Notification@phila.gov">RCO.Notification@phila.gov</a>.
+                </div>
+                <div id="splashDontShow" class="clickable float-right">
+                    <input id="doNotShowSplash" type="checkbox" />
+                    <label id="doNotShowSplashLabel" for="doNotShowSplash">Don't Show Again</label>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div id="panelMap"></div>
+            <div id="panelUI">
+                <div id="panelInner">
+                    <div id="panelBox" class="shadow">
+                        <div id="btnAbout">Info</div>
+                        <div id="boxTitle" class="box">RCO NOTIFICATION FOR ZONING APPLICATIONS</div>
+                        <div id="boxNotify">
+                            <div id="boxSearch"></div>
+                            <div id="boxResults">
+                                <div id="boxSubject" class="boxRow"></div>
+                                <div id="boxCouncil" class="boxRow"></div>
+                                <div id="boxRCO" class="boxRow"></div>
+                                <div id="boxNum"></div>
+                                <div id="boxLabel">PROPERTIES NEED TO BE NOTIFIED</div>
+                                <div id="boxDownload">
+                                    <div id="btnDwn" class="btn">DOWNLOAD RCO LIST</div>
+
+                                    <div id="btnCSV" class="btn">DOWNLOAD ADDRESS LIST</div>
+                                    <div id="btnMax">DAILY DOWNLOAD LIMIT REACHED</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="boxAbout">
+                            The Philadelphia Zoning Code includes provisions for ensuring that neighbors of proposed developments are notified and have an opportunity to provide input regarding zoning decisions that may impact them. This is accomplished through a standardized system of direct notification and through public meetings that are held in communities and convened by Registered Community Organizations (RCOs). <a href="//www.phila.gov/CityPlanning/projectreviews/Pages/RegisteredCommunityOrganizations.aspx" target=_blank>More Details</a>
+                            <br /><br />
+                            <div id="btnEmail" class="btn">CONTACT US</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ESRI APP -->
+    <!-- ******** -->
+    <a href="#page" id="back-to-top"><i class="fa fa-arrow-up" aria-hidden="true"></i><br>Top</a>
+    <footer data-swiftype-index='false' class="site-footer">
+        <div id="full-footer-start" class="philly311">
+        </div>
+        <div class="fat">
+            <div class="row pvs ptl-mu phm equal-height">
+                <section class="medium-8 columns phm pvm pvn-mu equal">
+                    <nav class="take-action">
+                        <ul>
+                            <li class="pvxs"><img class="PCPC-Logo center" src="images/PCPC_Logo.png" alt="PCPC Logo" /></li>
+                            <li class="pvxs"><img class="center" src="images/DPD_Logo.png" alt="DPD Logo" /><br /></li>
+                        </ul>
+                    </nav>
+                </section>
+                <section class="medium-8 columns phm pll-mu pvm pvn-mu equal">
+                    <h2 class="mtn mbm"> Contact Planning and Development</h2>
+                    <nav class="take-action">
+
+                        <ul>
+                            <li>
+                                <a href="mailto:RCO.Notification@Phila.gov" class="u-email">RCO.Notification<wbr>@phila.gov</a>
+                            </li>
+                            <li>
+                                <div class="p-tel">
+                                    <span class="type accessible">Phone: </span>
+                                    <a href="tel:2156834615" class="value">(215)-683-4615</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                </section>
+                <section class="medium-8 columns phm pll-mu pvm pvn-mu equal">
+                    <h2 class="mtn mbm">Connect with Planning and Development</h2>
+                    <nav class="city-social">
+                        <ul class="inline-list">
+                            <li class="pbm">
+                                <a href="https://www.facebook.com/PHLPlanDevelop/" class="prl" data-analytics="social" target="_blank">
+                                    <i class="fa fa-facebook fa-3x" title="Facebook" aria-hidden="true"></i>
+                                    <span class="show-for-sr">Facebook</span>
+                                </a>
+                            </li>
+                            <li class="pbm">
+                                <a href="https://twitter.com/PHLPlanDevelop" class="prl" data-analytics="social" target="_blank">
+                                    <i class="fa fa-twitter fa-3x" title="Twitter" aria-hidden="true"></i>
+                                    <span class="show-for-sr">Twitter</span>
+                                </a>
+                            </li>
+                            <li class="pbm">
+                                <a href="https://www.instagram.com/PHLPlanDevelop/" class="prl" data-analytics="social" target="_blank">
+                                    <i class="fa fa-instagram fa-3x" title="Instagram" aria-hidden="true"></i>
+                                    <span class="show-for-sr">Instagram</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </section>
+            </div>
+        </div>
+        <div class="bg-black">
+            <div class="row classic">
+                <nav class="columns center">
+                    <ul class="inline-list">
+                        <li><a href="https://beta.phila.gov/terms-of-use/">Terms of use</a></li>
+                        <li><a href="//www.phila.gov/privacy/pdfs/FinalCityOpenRecords.pdf">Right to know (pdf)</a></li>
+                        <li><a href="https://beta.phila.gov/privacypolicy/">Privacy Policy</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </footer>
+    <script src="phila-standards/js/phila-standards.min.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script type="text/javascript">
+        var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+        var dojoConfig = {
+            // The locationPath logic below may look confusing but all its doing is
+            // enabling us to load the api from a CDN and load local modules from the correct location.
+            packages: [{
+                name: "app",
+                location: package_path + '/js'
+            }]
+        };
+    </script>
+    <!-- ESRI -->
+    <script type="text/javascript" src="//js.arcgis.com/4.10/"></script>
+    <script type="text/javascript">
+        require([
+            "dojo/io-query",
+            "app/settings",
+            "app/main"
+        ], function (
+            ioQuery,
+            settings,
+            Main
+        ) {
+
+                // process url parameters
+                var url = document.location.href;
+                var query = url.substring(url.indexOf("?") + 1, url.length);
+                if (query.length > 0) {
+                    var queryObject = ioQuery.queryToObject(query);
+                    if (queryObject.webmap) {
+                        settings.webmap = queryObject.webmap;
+                    }
+                }
+                var app = new Main();
+            app.startup(settings);
+            });
+    </script>
+</body>
+</html>
