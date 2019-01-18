@@ -38,7 +38,7 @@ define([
     "esri/WebMap",
 
     "esri/widgets/Search",
-
+    
     "dojo/domReady!"
 
 ], function (
@@ -212,7 +212,7 @@ define([
                 query.geometry = this.view.extent;
                 query.returnGeometry = true;
                 query.outFields = ["ADDRESS"];
-                this.lyr.queryFeatures(query).when(lang.hitch(this, function (results) {
+                this.lyr.queryFeatures(query).then(lang.hitch(this, function (results) {
                     var graphics = [];
                     array.forEach(results.features, lang.hitch(this, function (f) {
                         var txt = f.attributes.ADDRESS.split(" ")[0];
@@ -251,7 +251,7 @@ define([
                 var sources = [{
                     locator: new Locator({ url: this.settings.locatorUrl }),
                     singleLineFieldName: "Single Line Input",
-                    name: "Philly",
+                    name: "City Geocoder",
                     localSearchOptions: {
                         minScale: 300000,
                         distance: 50000
@@ -265,7 +265,8 @@ define([
                     container: "boxSearch",
                     allPlaceholder: "Enter Address",
                     sources: sources,
-                    autoSelect: false
+                    autoSelect: false,
+                    includeDefaultSources: false
                 });
                 this.searchWidget.allPlaceholder = "Enter Address";
                 on(this.searchWidget, "search-complete", lang.hitch(this, this._searchComplete));
@@ -297,6 +298,8 @@ define([
             // select property
             _selectProperty: function (pt, zoom) {
                 this._clear();
+
+                var latLng = [pt.longitude, pt.latitude];
                 var query = new Query();
                 var queryTask = new QueryTask({
                     url: this.settings.parcelsUrl
@@ -305,26 +308,33 @@ define([
                 query.returnGeometry = true;
                 query.outFields = ["*"];
                 query.outSpatialReference = this.view.spatialReference;
-                queryTask.execute(query).then(lang.hitch(this, function (results) {
-                    var features = results.features;
-                    if (features.length > 0) {
-                        var gra = features[0];
-                        this._getSubject(gra);
-                        this._getCouncil(gra.geometry);
-                        this._getRCO(gra.geometry);
-                        this._getZIP(gra.geometry);
-                        this._bufferProperty(gra.geometry);
-                        this._updateSubject();
-                    }
-                    if (zoom) {
-                        this._zoomTo(pt);
-                    }
-                }));
+                const aisRequest = request(`${this.settings.aisApiUrl}${this.settings.aisReverseGeocodePath}${latLng}?gatekeeperKey=${this.settings.gateKeeperKey}`);
+                const agoRequest = queryTask.execute(query);
+                all([aisRequest, agoRequest])
+                    .then(lang.hitch(this, function (result) {
+                        const aisResult = JSON.parse(result[0]);
+                        const agoResult = result[1];
+
+                        const features = aisResult.features;
+                        if (features.length > 0) {
+                            const aisFeature = aisResult.features[0];
+                            const agoFeature = agoResult.features[0];
+
+                            this._getSubject(aisFeature);
+                            this._getCouncil(agoFeature.geometry);
+                            this._getRCO(agoFeature.geometry);
+                            this._bufferProperty(agoFeature.geometry);
+                            this._updateSubject();
+                        }
+                        if (zoom) {
+                            this._zoomTo(pt);
+                        }
+                    }));
             },
 
             // get subject
             _getSubject: function (gra) {
-                var attr = this._getAttributes(gra.attributes);
+                var attr = this._getAttributes(gra.properties);
                 this.subject = {
                     address: attr[0]
                 };
@@ -397,41 +407,6 @@ define([
                 return info;
             },
 
-            // get zip code
-            _getZIP: function (geom) {
-                var latLng = [geom.centroid.longitude, geom.centroid.latitude];
-                request(`${this.settings.aisApiUrl}${this.settings.aisReverseGeocodePath}${latLng}?gatekeeperKey=${this.settings.gateKeeperKey}`)
-                    .then(function (result) {
-                        var resultObj = JSON.parse(result);
-                        this.subject.ZipCode = resultObj.features[0].properties.zip_code;
-                        this._updateSubject();
-                    });
-            },
-
-            // get zip codes for export features
-            _getZipByProperty: function (features) {
-                var requestUrl = `${this.settings.aisApiUrl}${this.settings.aisSearchPath}{0}?gatekeeperKey=${this.settings.gateKeeperKey}`;
-                var featureQueries = array.map(features,
-                    function (feature) {
-                        return request.get(requestUrl.replace('{0}', feature.attributes.BRT_ID));
-                    });
-                var hitchFeatures = this.features;
-                return all(featureQueries).then(function (results) {
-                    results.forEach(lang.hitch(hitchFeatures, function (result, index) {
-                        var str = "";
-                        var apiFeatures = JSON.parse(result).features;
-                        if (apiFeatures.length > 0) {
-                            var list = [];
-                            array.forEach(apiFeatures, function (f) {
-                                list.push(f.properties.zip_code);
-                            });
-                            str = list.join(", ");
-                            hitchFeatures[index].attributes.CODE = str;
-                        }
-                    }));
-                });
-            },
-
             // update subject
             _updateSubject: function () {
                 if (this.subject) {
@@ -442,10 +417,10 @@ define([
             },
 
             _getAttributes: function (attr) {
-                var addr = attr.ADDRESS || "";
+                var addr = attr.street_address || "";
                 var city = "Philadelphia";
                 var state = "PA";
-                var ZIP = attr.CODE || "";
+                var ZIP = (attr.zip_code ? attr.zip_code.substring(0, 5) : "") || "";
                 return [addr, city, state, ZIP];
             },
 
@@ -509,19 +484,38 @@ define([
 
             // select parcels
             _selectParcels: function (geom) {
-                var query = new Query();
-                var queryTask = new QueryTask({
+                var pwdQuery = new Query();
+                var pwdQueryTask = new QueryTask({
                     url: this.settings.parcelsUrl
                 });
-                query.geometry = geom;
-                query.returnGeometry = true;
-                query.outFields = ["*"];
-                query.orderByFields = ["TENCODE"];
-                query.outSpatialReference = this.view.spatialReference;
-                queryTask.execute(query).then(lang.hitch(this, function (results) {
-                    this.features = results.features;
-                    this._updateStats(this.features);
-                }));
+                pwdQuery.geometry = geom;
+                pwdQuery.returnGeometry = false;
+                pwdQuery.outFields = ["BRT_ID"];
+                pwdQuery.outSpatialReference = this.view.spatialReference;
+
+                pwdQueryTask.execute(pwdQuery)
+                    .then(lang.hitch(this, function (results) {
+                        var opaQuery = new Query();
+                        var opaQueryTask = new QueryTask({
+                            url: this.settings.opaPropertiesUrl
+                        });
+                        opaQuery.where = `PARCEL_NUMBER IN (${results.features.map(x => `'${x.attributes.BRT_ID}'`).join(',')})`
+                        opaQuery.returnGeometry = false;
+                        opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE"];
+                        opaQuery.outSpatialReference = this.view.spatialReference;
+                        opaQueryTask.execute(opaQuery).then(lang.hitch(this, function (opaResults) {
+                            this.features = opaResults.features.map(function (feature) {
+                                return {
+                                    attributes: {
+                                        street_address: feature.attributes.LOCATION,
+                                        parcel_number: feature.attributes.PARCEL_NUMBER,
+                                        zip_code: feature.attributes.ZIP_CODE
+                                    }
+                                }
+                            });
+                            this._updateStats(this.features);
+                        }));
+                    }));
             },
 
             // zoom to
@@ -535,8 +529,6 @@ define([
 
             // update stats
             _updateStats: function (features) {
-                // start getting zip codes as soon as property is selected.
-                this._getZipByProperty(features);
                 dom.byId("boxNum").innerHTML = features.length;
                 var style = features.length > 0 ? "block" : "none";
                 domStyle.set("boxNum", "display", "block");

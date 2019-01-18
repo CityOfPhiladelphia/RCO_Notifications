@@ -1,0 +1,24 @@
+{
+  "name": "RCO_Notifications",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "phila-standards": "^1.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickwade-phl/RCO_Notifications.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nickwade-phl/RCO_Notifications/issues"
+  },
+  "homepage": "https://github.com/nickwade-phl/RCO_Notifications#readme"
+}
