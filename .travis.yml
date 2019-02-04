@@ -12,3 +12,4 @@ deploy:
     bucket: 'planning-rco-notification-map'
     on:
       branch: master
+    skip_cleanup: true
