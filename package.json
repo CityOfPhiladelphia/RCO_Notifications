@@ -1,6 +1,6 @@
 {
   "name": "RCO_Notifications",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -9,13 +9,13 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nickwade-phl/RCO_Notifications.git"
+    "url": "git+https://github.com/CityOfPhiladelphia/RCO_Notifications.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nickwade-phl/RCO_Notifications/issues"
+    "url": "https://github.com/CityOfPhiladelphia/RCO_Notifications/issues"
   },
-  "homepage": "https://github.com/nickwade-phl/RCO_Notifications#readme"
+  "homepage": "https://github.com/CityOfPhiladelphia/RCO_Notifications#readme"
 }
