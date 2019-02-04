@@ -7,10 +7,6 @@
     "phila-standards": "^1.0.2"
   },
   "devDependencies": {},
-  "scripts": {
-    "build": "echo \"Error: no test specified\" && exit 1",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CityOfPhiladelphia/RCO_Notifications.git"
