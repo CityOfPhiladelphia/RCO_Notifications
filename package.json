@@ -12,13 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nickwade-phl/RCO_Notifications.git"
+    "url": "git+https://github.com/CityOfPhiladelphia/RCO_Notifications.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nickwade-phl/RCO_Notifications/issues"
+    "url": "https://github.com/CityOfPhiladelphia/RCO_Notifications/issues"
   },
-  "homepage": "https://github.com/nickwade-phl/RCO_Notifications#readme"
+  "homepage": "https://github.com/CityOfPhiladelphia/RCO_Notifications#readme"
 }
