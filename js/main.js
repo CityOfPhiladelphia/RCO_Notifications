@@ -3,70 +3,65 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/_base/Color",
-
     "dojo/cookie",
-
     "dojo/Deferred",
-
     "dojo/promise/all",
-
     "dojo/dom",
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/dom-style",
     "dojo/query",
-
     "dojo/on",
     "dojo/request",
-
     "esri/geometry/geometryEngine",
-
     "esri/Graphic",
-
     "esri/layers/GraphicsLayer",
-
     "esri/symbols/PictureMarkerSymbol",
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleMarkerSymbol",
-
     "esri/tasks/Locator",
     "esri/tasks/QueryTask",
     "esri/tasks/support/Query",
-
     "esri/views/MapView",
-
     "esri/WebMap",
-
     "esri/widgets/Search",
-    
     "dojo/domReady!"
-
 ], function (
-    declare, array, lang, Color,
+    declare,
+    array,
+    lang,
+    Color,
     cookie,
     Deferred,
     all,
-    dom, domClass, domConstruct, domStyle, cssQuery,
-    on, request,
+    dom,
+    domClass,
+    domConstruct,
+    domStyle,
+    cssQuery,
+    on,
+    request,
     geometryEngine,
     Graphic,
     GraphicsLayer,
-    PictureMarkerSymbol, SimpleFillSymbol, SimpleMarkerSymbol,
-    Locator, QueryTask, Query,
+    PictureMarkerSymbol,
+    SimpleFillSymbol,
+    SimpleMarkerSymbol,
+    Locator,
+    QueryTask,
+    Query,
     MapView,
     WebMap,
     Search
 ) {
         return declare(null, {
-
             settings: {},
             subject: null,
             features: [],
             rcoInfo: null,
 
-
             // startup
-            startup: function (settings) {
+            startup: function startup(settings) {
                 var promise;
                 if (settings) {
                     this.settings = settings;
@@ -82,50 +77,48 @@ define([
             },
 
             // report error
-            reportError: function (error) {
+            reportError: function reportError(error) {
                 console.error(error.message);
             },
 
             // init app
-            _initApp: function () {
+            _initApp: function _initApp() {
                 this._initSplash();
                 this._initMap();
             },
 
             // ** Splash ** //
-            _initSplash: function () {
-                var splash = dom.byId('splashScreen');
-                var dontShowCheck = dom.byId('doNotShowSplash');
-                var clickables = cssQuery('.clickable');
+            _initSplash: function _initSplash() {
+                var splash = dom.byId("splashScreen");
+                var dontShowCheck = dom.byId("doNotShowSplash");
+                var clickables = cssQuery(".clickable");
 
-                if (cookie('hideSplashByDefault') === "true") {
+                if (cookie("hideSplashByDefault") === "true") {
                     domStyle.set(splash, "display", "none");
                     domStyle.set(splash, "z-index", -10);
                     dontShowCheck.checked = true;
-                }
-                else {
+                } else {
                     domStyle.set(splash, "display", "block");
                     domStyle.set(splash, "z-index", 10);
                     dontShowCheck.checked = false;
                 }
 
-                on(splash, 'click', function () {
-                    domStyle.set(splash, 'display', 'none');
-                    domStyle.set(splash, 'z-index', -10)
+                on(splash, "click", function () {
+                    domStyle.set(splash, "display", "none");
+                    domStyle.set(splash, "z-index", -10);
                 });
 
                 clickables.forEach(function (clickable) {
-                    on(clickable, 'click', function () {
+                    on(clickable, "click", function () {
                         event.stopPropagation();
-                    })
+                    });
                 });
 
-                on(dontShowCheck, 'change', function () {
+                on(dontShowCheck, "change", function () {
                     if (dontShowCheck.checked) {
-                        cookie('hideSplashByDefault', true);
-                    }
-                    else {
-                        cookie('hideSplashByDefault', false);
+                        cookie("hideSplashByDefault", true);
+                    } else {
+                        cookie("hideSplashByDefault", false);
                     }
                 });
             },
@@ -133,7 +126,7 @@ define([
             // ** MAP ** //
 
             // init map
-            _initMap: function () {
+            _initMap: function _initMap() {
                 console.log(this.settings);
                 var webmap = new WebMap({
                     portalItem: {
@@ -144,7 +137,7 @@ define([
             },
 
             // init view
-            _initView: function (webmap) {
+            _initView: function _initView(webmap) {
                 this.view = new MapView({
                     container: "panelMap",
                     map: webmap,
@@ -152,22 +145,25 @@ define([
                         components: ["zoom", "attribution"]
                     }
                 });
-                this.view.when(lang.hitch(this, function () {
-                    this._initLayers();
-                    this._initUI();
-                    this.view.on("click", lang.hitch(this, this._viewClick));
-                    if (this.settings.labelLayer) {
-                        this.view.watch("extent", lang.hitch(this, this._extentChange));
-                    }
-                    this._extentChange();
-                }), lang.hitch(this, function () {
-                    var error = new Error("Main:: Unable to create scene");
-                    this.reportError(error);
-                }));
+                this.view.when(
+                    lang.hitch(this, function () {
+                        this._initLayers();
+                        this._initUI();
+                        this.view.on("click", lang.hitch(this, this._viewClick));
+                        if (this.settings.labelLayer) {
+                            this.view.watch("extent", lang.hitch(this, this._extentChange));
+                        }
+                        this._extentChange();
+                    }),
+                    lang.hitch(this, function () {
+                        var error = new Error("Main:: Unable to create scene");
+                        this.reportError(error);
+                    })
+                );
             },
 
             // init layers
-            _initLayers: function () {
+            _initLayers: function _initLayers() {
                 this.lyrParcels = new GraphicsLayer();
                 this.view.map.add(this.lyrParcels);
                 this.lyrGraphics = new GraphicsLayer();
@@ -175,25 +171,27 @@ define([
                 this.lyrLabels = new GraphicsLayer();
                 this.view.map.add(this.lyrLabels);
                 if (this.settings.labelLayer) {
-                    this.view.map.layers.forEach(lang.hitch(this, function (lyr) {
-                        if (lyr.type === "feature") {
-                            if (lyr.title === this.settings.labelLayer) {
-                                this.lyr = lyr;
+                    this.view.map.layers.forEach(
+                        lang.hitch(this, function (lyr) {
+                            if (lyr.type === "feature") {
+                                if (lyr.title === this.settings.labelLayer) {
+                                    this.lyr = lyr;
+                                }
                             }
-                        }
-                    }));
+                        })
+                    );
                 }
             },
 
             // view click
-            _viewClick: function (evt) {
+            _viewClick: function _viewClick(evt) {
                 this.searchWidget.clear();
                 var pt = evt.mapPoint;
                 this._selectProperty(pt, false);
             },
 
             // extent change
-            _extentChange: function () {
+            _extentChange: function _extentChange() {
                 if (this.timer) {
                     clearTimeout(this.timer);
                     this.timer = null;
@@ -202,7 +200,7 @@ define([
             },
 
             // update labels
-            _updateLabels: function () {
+            _updateLabels: function _updateLabels() {
                 this.lyrLabels.removeAll();
                 if (this.view.zoom < 18) {
                     return;
@@ -212,54 +210,60 @@ define([
                 query.geometry = this.view.extent;
                 query.returnGeometry = true;
                 query.outFields = ["ADDRESS"];
-                this.lyr.queryFeatures(query).then(lang.hitch(this, function (results) {
-                    var graphics = [];
-                    array.forEach(results.features, lang.hitch(this, function (f) {
-                        var txt = f.attributes.ADDRESS.split(" ")[0];
-                        var pt = f.geometry.centroid;
-                        var sym = {
-                            type: "text",
-                            color: "#c8c8c8",
-                            text: txt,
-                            font: {
-                                size: 7,
-                                family: "sans-serif",
-                                weight: "bolder",
-                                horizontalAlignment: "center",
-                                verticalAlignment: "middle"
-                            }
-                        };
-                        var gra = new Graphic({
-                            geometry: pt,
-                            symbol: sym
-                        });
-                        graphics.push(gra);
-                    }));
-                    this.lyrLabels.addMany(graphics);
-                }));
+                this.lyr.queryFeatures(query).then(
+                    lang.hitch(this, function (results) {
+                        var graphics = [];
+                        array.forEach(
+                            results.features,
+                            lang.hitch(this, function (f) {
+                                var txt = f.attributes.ADDRESS.split(" ")[0];
+                                var pt = f.geometry.centroid;
+                                var sym = {
+                                    type: "text",
+                                    color: "#c8c8c8",
+                                    text: txt,
+                                    font: {
+                                        size: 7,
+                                        family: "sans-serif",
+                                        weight: "bolder",
+                                        horizontalAlignment: "center",
+                                        verticalAlignment: "middle"
+                                    }
+                                };
+                                var gra = new Graphic({
+                                    geometry: pt,
+                                    symbol: sym
+                                });
+                                graphics.push(gra);
+                            })
+                        );
+                        this.lyrLabels.addMany(graphics);
+                    })
+                );
             },
-
 
             // ** UI ** //
 
             // init ui
-            _initUI: function () {
+            _initUI: function _initUI() {
                 var rgba = [255, 255, 255]; //this.settings.color.slice();
                 rgba.push(0.85);
                 var color = "rgba(" + rgba.join(",") + ")";
                 domStyle.set("panelBox", "background-color", color);
-                var sources = [{
-                    locator: new Locator({ url: this.settings.locatorUrl }),
-                    singleLineFieldName: "Single Line Input",
-                    name: "City Geocoder",
-                    localSearchOptions: {
-                        minScale: 300000,
-                        distance: 50000
-                    },
-                    placeholder: "Enter Address",
-                    suggestionsEnabled: true,
-                    minSuggestCharacters: 0
-                }];
+                var sources = [
+                    {
+                        locator: new Locator({ url: this.settings.locatorUrl }),
+                        singleLineFieldName: "Single Line Input",
+                        name: "City Geocoder",
+                        localSearchOptions: {
+                            minScale: 300000,
+                            distance: 50000
+                        },
+                        placeholder: "Enter Address",
+                        suggestionsEnabled: true,
+                        minSuggestCharacters: 0
+                    }
+                ];
                 this.searchWidget = new Search({
                     view: this.view,
                     container: "boxSearch",
@@ -269,8 +273,16 @@ define([
                     includeDefaultSources: false
                 });
                 this.searchWidget.allPlaceholder = "Enter Address";
-                on(this.searchWidget, "search-complete", lang.hitch(this, this._searchComplete));
-                on(this.searchWidget, "search-clear", lang.hitch(this, this._searchClear));
+                on(
+                    this.searchWidget,
+                    "search-complete",
+                    lang.hitch(this, this._searchComplete)
+                );
+                on(
+                    this.searchWidget,
+                    "search-clear",
+                    lang.hitch(this, this._searchClear)
+                );
                 on(dom.byId("btnCSV"), "click", lang.hitch(this, this._downloadClick));
                 on(dom.byId("btnAbout"), "click", lang.hitch(this, this._toggleAbout));
                 on(dom.byId("btnEmail"), "click", lang.hitch(this, this._sendEmail));
@@ -278,7 +290,7 @@ define([
             },
 
             // search complete
-            _searchComplete: function (evt) {
+            _searchComplete: function _searchComplete(evt) {
                 if (evt.results.length > 0) {
                     var geoResults = evt.results[0];
                     var results = geoResults.results;
@@ -291,12 +303,12 @@ define([
             },
 
             // search clear
-            _searchClear: function () {
+            _searchClear: function _searchClear() {
                 this._clear();
             },
 
             // select property
-            _selectProperty: function (pt, zoom) {
+            _selectProperty: function _selectProperty(pt, zoom) {
                 this._clear();
 
                 var latLng = [pt.longitude, pt.latitude];
@@ -308,17 +320,24 @@ define([
                 query.returnGeometry = true;
                 query.outFields = ["*"];
                 query.outSpatialReference = this.view.spatialReference;
-                const aisRequest = request(`${this.settings.aisApiUrl}${this.settings.aisReverseGeocodePath}${latLng}?gatekeeperKey=${this.settings.gateKeeperKey}`);
-                const agoRequest = queryTask.execute(query);
-                all([aisRequest, agoRequest])
-                    .then(lang.hitch(this, function (result) {
-                        const aisResult = JSON.parse(result[0]);
-                        const agoResult = result[1];
+                var aisRequest = request(
+                    "" +
+                    this.settings.aisApiUrl +
+                    this.settings.aisReverseGeocodePath +
+                    latLng +
+                    "?gatekeeperKey=" +
+                    this.settings.gateKeeperKey
+                );
+                var agoRequest = queryTask.execute(query);
+                all([aisRequest, agoRequest]).then(
+                    lang.hitch(this, function (result) {
+                        var aisResult = JSON.parse(result[0]);
+                        var agoResult = result[1];
 
-                        const features = aisResult.features;
+                        var features = aisResult.features;
                         if (features.length > 0) {
-                            const aisFeature = aisResult.features[0];
-                            const agoFeature = agoResult.features[0];
+                            var aisFeature = aisResult.features[0];
+                            var agoFeature = agoResult.features[0];
 
                             this._getSubject(aisFeature);
                             this._getCouncil(agoFeature.geometry);
@@ -329,11 +348,12 @@ define([
                         if (zoom) {
                             this._zoomTo(pt);
                         }
-                    }));
+                    })
+                );
             },
 
             // get subject
-            _getSubject: function (gra) {
+            _getSubject: function _getSubject(gra) {
                 var attr = this._getAttributes(gra.properties);
                 this.subject = {
                     address: attr[0]
@@ -341,7 +361,7 @@ define([
             },
 
             // get council
-            _getCouncil: function (geom) {
+            _getCouncil: function _getCouncil(geom) {
                 var query = new Query();
                 var queryTask = new QueryTask({
                     url: this.settings.councilUrl
@@ -349,23 +369,25 @@ define([
                 query.geometry = geom;
                 query.returnGeometry = false;
                 query.outFields = ["*"];
-                queryTask.execute(query).then(lang.hitch(this, function (results) {
-                    var str = "";
-                    var features = results.features;
-                    if (features.length > 0) {
-                        var list = [];
-                        array.forEach(features, function (f) {
-                            list.push(f.attributes.DISTRICT);
-                        });
-                        str = list.join(", ");
-                    }
-                    this.subject.council = str;
-                    this._updateSubject();
-                }));
+                queryTask.execute(query).then(
+                    lang.hitch(this, function (results) {
+                        var str = "";
+                        var features = results.features;
+                        if (features.length > 0) {
+                            var list = [];
+                            array.forEach(features, function (f) {
+                                list.push(f.attributes.DISTRICT);
+                            });
+                            str = list.join(", ");
+                        }
+                        this.subject.council = str;
+                        this._updateSubject();
+                    })
+                );
             },
 
             // get rco
-            _getRCO: function (geom) {
+            _getRCO: function _getRCO(geom) {
                 var query = new Query();
                 var queryTask = new QueryTask({
                     url: this.settings.rcoUrl
@@ -373,30 +395,32 @@ define([
                 query.geometry = geom;
                 query.returnGeometry = false;
                 query.outFields = ["*"];
-                queryTask.execute(query).then(lang.hitch(this, function (results) {
-                    var str = "";
-                    var features = results.features;
-                    if (features.length > 0) {
-                        var list = [];
-                        array.forEach(features, function (f) {
-                            list.push(f.attributes.ORGANIZATION_NAME);
-                        });
-                        str = list.join(", ");
-                    }
-                    this.subject.rco = str;
-                    this.subject.rcoInfo = this._getRCOInfo(features);
-                    this._updateSubject();
-                }));
+                queryTask.execute(query).then(
+                    lang.hitch(this, function (results) {
+                        var str = "";
+                        var features = results.features;
+                        if (features.length > 0) {
+                            var list = [];
+                            array.forEach(features, function (f) {
+                                list.push(f.attributes.ORGANIZATION_NAME);
+                            });
+                            str = list.join(", ");
+                        }
+                        this.subject.rco = str;
+                        this.subject.rcoInfo = this._getRCOInfo(features);
+                        this._updateSubject();
+                    })
+                );
             },
             // get rco info
-            _getRCOInfo: function (features) {
+            _getRCOInfo: function _getRCOInfo(features) {
                 var info = "";
                 var flds = this.settings.rcoFields;
                 info += flds.join(",") + "\n";
                 array.forEach(features, function (f) {
                     var attr = f.attributes;
                     for (var i = 0; i < flds.length; i++) {
-                        info += "\"" + attr[flds[i]] + "\"";
+                        info += '"' + attr[flds[i]] + '"';
                         if (i < flds.length - 1) {
                             info += ",";
                         }
@@ -408,15 +432,18 @@ define([
             },
 
             // update subject
-            _updateSubject: function () {
+            _updateSubject: function _updateSubject() {
                 if (this.subject) {
-                    dom.byId("boxSubject").innerHTML = "<span class='fld'>SUBJECT: </span>" + this.subject.address;
-                    dom.byId("boxCouncil").innerHTML = "<span class='fld'>COUNCIL DISTRICT: </span>" + this.subject.council;
-                    dom.byId("boxRCO").innerHTML = "<span class='fld'>RCO</span>: " + this.subject.rco;
+                    dom.byId("boxSubject").innerHTML =
+                        "<span class='fld'>SUBJECT: </span>" + this.subject.address;
+                    dom.byId("boxCouncil").innerHTML =
+                        "<span class='fld'>COUNCIL DISTRICT: </span>" + this.subject.council;
+                    dom.byId("boxRCO").innerHTML =
+                        "<span class='fld'>RCO</span>: " + this.subject.rco;
                 }
             },
 
-            _getAttributes: function (attr) {
+            _getAttributes: function _getAttributes(attr) {
                 var addr = attr.street_address || "";
                 var city = "Philadelphia";
                 var state = "PA";
@@ -425,7 +452,7 @@ define([
             },
 
             // buffer property
-            _bufferProperty: function (geom) {
+            _bufferProperty: function _bufferProperty(geom) {
                 // subject
                 var symSubj = new SimpleFillSymbol({
                     color: [255, 255, 255, 0.5],
@@ -439,7 +466,11 @@ define([
                     symbol: symSubj
                 });
                 // buffer
-                var buffer = geometryEngine.geodesicBuffer(geom, this.settings.distance, "feet");
+                var buffer = geometryEngine.geodesicBuffer(
+                    geom,
+                    this.settings.distance,
+                    "feet"
+                );
                 this._selectParcels(buffer);
                 var rgba1 = this.settings.color.slice();
                 rgba1.push(0.2);
@@ -483,7 +514,7 @@ define([
             },
 
             // select parcels
-            _selectParcels: function (geom) {
+            _selectParcels: function _selectParcels(geom) {
                 var pwdQuery = new Query();
                 var pwdQueryTask = new QueryTask({
                     url: this.settings.parcelsUrl
@@ -493,34 +524,44 @@ define([
                 pwdQuery.outFields = ["BRT_ID"];
                 pwdQuery.outSpatialReference = this.view.spatialReference;
 
-                pwdQueryTask.execute(pwdQuery)
-                    .then(lang.hitch(this, function (results) {
+                pwdQueryTask.execute(pwdQuery).then(
+                    lang.hitch(this, function (results) {
                         var opaQuery = new Query();
                         var opaQueryTask = new QueryTask({
                             url: this.settings.opaPropertiesUrl
                         });
-                        opaQuery.where = `PARCEL_NUMBER IN (${results.features.map(x => `'${x.attributes.BRT_ID}'`).join(',')})`
+                        opaQuery.where =
+                            "PARCEL_NUMBER IN (" +
+                            results.features
+                                .map(function (x) {
+                                    return "'" + x.attributes.BRT_ID + "'";
+                                })
+                                .join(",") +
+                            ")";
                         opaQuery.returnGeometry = false;
                         opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE"];
                         opaQuery.outSpatialReference = this.view.spatialReference;
-                        opaQueryTask.execute(opaQuery).then(lang.hitch(this, function (opaResults) {
-                            this.features = opaResults.features.map(function (feature) {
-                                return {
-                                    attributes: {
-                                        street_address: feature.attributes.LOCATION,
-                                        parcel_number: feature.attributes.PARCEL_NUMBER,
-                                        zip_code: feature.attributes.ZIP_CODE
-                                    }
-                                }
-                            });
-                            this._updateStats(this.features);
-                        }));
-                    }));
+                        opaQueryTask.execute(opaQuery).then(
+                            lang.hitch(this, function (opaResults) {
+                                this.features = opaResults.features.map(function (feature) {
+                                    return {
+                                        attributes: {
+                                            street_address: feature.attributes.LOCATION,
+                                            parcel_number: feature.attributes.PARCEL_NUMBER,
+                                            zip_code: feature.attributes.ZIP_CODE
+                                        }
+                                    };
+                                });
+                                this._updateStats(this.features);
+                            })
+                        );
+                    })
+                );
             },
 
             // zoom to
-            _zoomTo: function (pt) {
-                pt.longitude = pt.longitude - .001;
+            _zoomTo: function _zoomTo(pt) {
+                pt.longitude = pt.longitude - 0.001;
                 this.view.goTo({
                     target: pt,
                     zoom: 17
@@ -528,7 +569,7 @@ define([
             },
 
             // update stats
-            _updateStats: function (features) {
+            _updateStats: function _updateStats(features) {
                 dom.byId("boxNum").innerHTML = features.length;
                 var style = features.length > 0 ? "block" : "none";
                 domStyle.set("boxNum", "display", "block");
@@ -542,19 +583,22 @@ define([
                         width: 2
                     }
                 });
-                array.forEach(features, lang.hitch(this, function (gra) {
-                    var g = new Graphic({
-                        geometry: gra.geometry,
-                        symbol: sym
-                    });
-                    this.lyrParcels.add(g);
-                }));
+                array.forEach(
+                    features,
+                    lang.hitch(this, function (gra) {
+                        var g = new Graphic({
+                            geometry: gra.geometry,
+                            symbol: sym
+                        });
+                        this.lyrParcels.add(g);
+                    })
+                );
                 this._checkHistory();
                 domClass.add("boxResults", "opened");
             },
 
             // clear
-            _clear: function () {
+            _clear: function _clear() {
                 this.features = [];
                 this.subject = null;
                 this.lyrParcels.removeAll();
@@ -565,12 +609,10 @@ define([
                 domClass.remove("boxResults", "opened");
             },
 
-
             //* CSV *//
 
             // check history
-            _checkHistory: function () {
-
+            _checkHistory: function _checkHistory() {
                 var num = 0;
                 if (cookie("dwn")) {
                     num = parseInt(cookie("dwn"), 10);
@@ -586,7 +628,7 @@ define([
             },
 
             // update history
-            _updateHistory: function () {
+            _updateHistory: function _updateHistory() {
                 var num = 0;
                 if (cookie("dwn")) {
                     num = parseInt(cookie("dwn"), 10);
@@ -600,7 +642,7 @@ define([
             },
 
             // download click
-            _downloadClick: function () {
+            _downloadClick: function _downloadClick() {
                 if (this.timer) {
                     clearTimeout(this.timer);
                     this.timer = null;
@@ -609,67 +651,86 @@ define([
                 this.timer = setTimeout(lang.hitch(this, this._downloadCSV), 3000);
             },
 
-            _downloadCSV: function () {
+            _downloadCSV: function _downloadCSV() {
                 var chk = this._checkHistory();
                 if (!chk) {
                     return;
                 }
                 this._updateHistory();
 
-                var content = '';
+                var content = "";
                 content += "ADDRESS,CITY,STATE,ZIP\n";
-                array.forEach(this.features, lang.hitch(this, function (f) {
-                    var attr = this._getAttributes(f.attributes);
-                    content += attr.join(",") + "\n";
-                }));
+                array.forEach(
+                    this.features,
+                    lang.hitch(this, function (f) {
+                        var attr = this._getAttributes(f.attributes);
+                        content += attr.join(",") + "\n";
+                    })
+                );
                 var fileName = "NotifyAddressList.csv";
                 var mimeType = "application/octet-stream";
-                var a = document.createElement('a');
-                if (navigator.msSaveBlob) { // IE10
-                    navigator.msSaveBlob(new Blob([content], {
-                        type: mimeType
-                    }), fileName);
-                } else if (URL && 'download' in a) { //html5 A[download]
-                    a.href = URL.createObjectURL(new Blob([content], {
-                        type: mimeType
-                    }));
-                    a.setAttribute('download', fileName);
+                var a = document.createElement("a");
+                if (navigator.msSaveBlob) {
+                    // IE10
+                    navigator.msSaveBlob(
+                        new Blob([content], {
+                            type: mimeType
+                        }),
+                        fileName
+                    );
+                } else if (URL && "download" in a) {
+                    //html5 A[download]
+                    a.href = URL.createObjectURL(
+                        new Blob([content], {
+                            type: mimeType
+                        })
+                    );
+                    a.setAttribute("download", fileName);
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                 } else {
-                    location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+                    location.href =
+                        "data:application/octet-stream," + encodeURIComponent(content); // only this mime type is supported
                 }
                 dom.byId("btnCSV").innerHTML = "DOWNLOAD ADDRESS LIST";
             },
 
-            _downloadRCO: function () {
+            _downloadRCO: function _downloadRCO() {
                 var content = this.subject.rcoInfo;
                 var fileName = "rco.csv";
                 var mimeType = "application/octet-stream";
-                var a = document.createElement('a');
-                if (navigator.msSaveBlob) { // IE10
-                    navigator.msSaveBlob(new Blob([content], {
-                        type: mimeType
-                    }), fileName);
-                } else if (URL && 'download' in a) { //html5 A[download]
-                    a.href = URL.createObjectURL(new Blob([content], {
-                        type: mimeType
-                    }));
-                    a.setAttribute('download', fileName);
+                var a = document.createElement("a");
+                if (navigator.msSaveBlob) {
+                    // IE10
+                    navigator.msSaveBlob(
+                        new Blob([content], {
+                            type: mimeType
+                        }),
+                        fileName
+                    );
+                } else if (URL && "download" in a) {
+                    //html5 A[download]
+                    a.href = URL.createObjectURL(
+                        new Blob([content], {
+                            type: mimeType
+                        })
+                    );
+                    a.setAttribute("download", fileName);
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                 } else {
-                    location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+                    location.href =
+                        "data:application/octet-stream," + encodeURIComponent(content); // only this mime type is supported
                 }
             },
 
             //* ABOUT *//
 
             // toggle about
-            _toggleAbout: function () {
-                var splash = dom.byId('splashScreen');
+            _toggleAbout: function _toggleAbout() {
+                var splash = dom.byId("splashScreen");
 
                 if (domStyle.get(splash, "display") === "block") {
                     domStyle.set(splash, "display", "none");
@@ -681,10 +742,10 @@ define([
             },
 
             // send email
-            _sendEmail: function () {
-                var url = "mailto:" + this.settings.email + "?subject=RCO Notification App";
+            _sendEmail: function _sendEmail() {
+                var url =
+                    "mailto:" + this.settings.email + "?subject=RCO Notification App";
                 window.location.href = url;
             }
-
         });
     });
