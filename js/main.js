@@ -1,3 +1,5 @@
+"use strict";
+
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
@@ -59,12 +61,13 @@ define([
             subject: null,
             features: [],
             rcoInfo: null,
-
             // startup
             startup: function startup(settings) {
                 var promise;
+
                 if (settings) {
                     this.settings = settings;
+
                     this._initApp();
                 } else {
                     var error = new Error("Main:: Settings are not defined");
@@ -73,20 +76,19 @@ define([
                     def.reject(error);
                     promise = def.promise;
                 }
+
                 return promise;
             },
-
             // report error
             reportError: function reportError(error) {
                 console.error(error.message);
             },
-
             // init app
             _initApp: function _initApp() {
                 this._initSplash();
+
                 this._initMap();
             },
-
             // ** Splash ** //
             _initSplash: function _initSplash() {
                 var splash = dom.byId("splashScreen");
@@ -107,13 +109,11 @@ define([
                     domStyle.set(splash, "display", "none");
                     domStyle.set(splash, "z-index", -10);
                 });
-
                 clickables.forEach(function (clickable) {
                     on(clickable, "click", function () {
                         event.stopPropagation();
                     });
                 });
-
                 on(dontShowCheck, "change", function () {
                     if (dontShowCheck.checked) {
                         cookie("hideSplashByDefault", true);
@@ -122,9 +122,7 @@ define([
                     }
                 });
             },
-
             // ** MAP ** //
-
             // init map
             _initMap: function _initMap() {
                 console.log(this.settings);
@@ -133,9 +131,9 @@ define([
                         id: this.settings.webmap
                     }
                 });
+
                 this._initView(webmap);
             },
-
             // init view
             _initView: function _initView(webmap) {
                 this.view = new MapView({
@@ -148,11 +146,15 @@ define([
                 this.view.when(
                     lang.hitch(this, function () {
                         this._initLayers();
+
                         this._initUI();
+
                         this.view.on("click", lang.hitch(this, this._viewClick));
+
                         if (this.settings.labelLayer) {
                             this.view.watch("extent", lang.hitch(this, this._extentChange));
                         }
+
                         this._extentChange();
                     }),
                     lang.hitch(this, function () {
@@ -161,7 +163,6 @@ define([
                     })
                 );
             },
-
             // init layers
             _initLayers: function _initLayers() {
                 this.lyrParcels = new GraphicsLayer();
@@ -170,6 +171,7 @@ define([
                 this.view.map.add(this.lyrGraphics);
                 this.lyrLabels = new GraphicsLayer();
                 this.view.map.add(this.lyrLabels);
+
                 if (this.settings.labelLayer) {
                     this.view.map.layers.forEach(
                         lang.hitch(this, function (lyr) {
@@ -182,29 +184,30 @@ define([
                     );
                 }
             },
-
             // view click
             _viewClick: function _viewClick(evt) {
                 this.searchWidget.clear();
                 var pt = evt.mapPoint;
+
                 this._selectProperty(pt, false);
             },
-
             // extent change
             _extentChange: function _extentChange() {
                 if (this.timer) {
                     clearTimeout(this.timer);
                     this.timer = null;
                 }
+
                 this.timer = setTimeout(lang.hitch(this, this._updateLabels), 900);
             },
-
             // update labels
             _updateLabels: function _updateLabels() {
                 this.lyrLabels.removeAll();
+
                 if (this.view.zoom < 18) {
                     return;
                 }
+
                 var query = new Query();
                 query.num = 2000;
                 query.geometry = this.view.extent;
@@ -241,18 +244,19 @@ define([
                     })
                 );
             },
-
             // ** UI ** //
-
             // init ui
             _initUI: function _initUI() {
                 var rgba = [255, 255, 255]; //this.settings.color.slice();
+
                 rgba.push(0.85);
                 var color = "rgba(" + rgba.join(",") + ")";
                 domStyle.set("panelBox", "background-color", color);
                 var sources = [
                     {
-                        locator: new Locator({ url: this.settings.locatorUrl }),
+                        locator: new Locator({
+                            url: this.settings.locatorUrl
+                        }),
                         singleLineFieldName: "Single Line Input",
                         name: "City Geocoder",
                         localSearchOptions: {
@@ -288,25 +292,25 @@ define([
                 on(dom.byId("btnEmail"), "click", lang.hitch(this, this._sendEmail));
                 on(dom.byId("btnDwn"), "click", lang.hitch(this, this._downloadRCO));
             },
-
             // search complete
             _searchComplete: function _searchComplete(evt) {
                 if (evt.results.length > 0) {
                     var geoResults = evt.results[0];
                     var results = geoResults.results;
+
                     if (results.length > 0) {
-                        var rec = results[0];
+                        // get last record, incase 2nd record in array
+                        var rec = results[results.length - 1];
                         var pt = rec.feature.geometry;
+
                         this._selectProperty(pt, true);
                     }
                 }
             },
-
             // search clear
             _searchClear: function _searchClear() {
                 this._clear();
             },
-
             // select property
             _selectProperty: function _selectProperty(pt, zoom) {
                 this._clear();
@@ -320,46 +324,90 @@ define([
                 query.returnGeometry = true;
                 query.outFields = ["*"];
                 query.outSpatialReference = this.view.spatialReference;
+                var agoRequest = queryTask.execute(query);
                 var aisRequest = request(
-                    "" +
                     this.settings.aisApiUrl +
                     this.settings.aisReverseGeocodePath +
                     latLng +
                     "?gatekeeperKey=" +
                     this.settings.gateKeeperKey
                 );
-                var agoRequest = queryTask.execute(query);
-                all([aisRequest, agoRequest]).then(
+                aisRequest.then(
+                    // success
                     lang.hitch(this, function (result) {
-                        var aisResult = JSON.parse(result[0]);
-                        var agoResult = result[1];
-
-                        var features = aisResult.features;
-                        if (features.length > 0) {
-                            var aisFeature = aisResult.features[0];
-                            var agoFeature = agoResult.features[0];
-
-                            this._getSubject(aisFeature);
-                            this._getCouncil(agoFeature.geometry);
-                            this._getRCO(agoFeature.geometry);
-                            this._bufferProperty(agoFeature.geometry);
-                            this._updateSubject();
-                        }
-                        if (zoom) {
-                            this._zoomTo(pt);
-                        }
+                        requestAgoInfo(
+                            agoRequest,
+                            function (agoData, _this) {
+                                processAisDataOnSuccess(agoData, _this, result);
+                            },
+                            this
+                        );
+                    }), // error / not found
+                    lang.hitch(this, function (error) {
+                        requestAgoInfo(agoRequest, queryAisByAddressOnFail, this);
                     })
                 );
-            },
 
+                function updateDataAndZoom(aisResult, agoResult, _this) {
+                    var features = aisResult.features;
+
+                    if (features.length > 0) {
+                        var aisFeature = aisResult.features[0];
+                        var agoFeature = agoResult.features[0];
+
+                        _this._getSubject(aisFeature);
+
+                        _this._getCouncil(agoFeature.geometry);
+
+                        _this._getRCO(agoFeature.geometry);
+
+                        _this._bufferProperty(agoFeature.geometry);
+
+                        _this._updateSubject();
+                    }
+
+                    if (zoom) {
+                        _this._zoomTo(pt);
+                    }
+                }
+
+                function requestAgoInfo(agoRequest, resultFunction, _this) {
+                    agoRequest.then(
+                        lang.hitch(this, function (result) {
+                            resultFunction(result, _this, arguments[0]);
+                        })
+                    );
+                }
+
+                function queryAisByAddressOnFail(agoData, _this) {
+                    var aisAddressRequest = request(
+                        _this.settings.aisApiUrl +
+                        _this.settings.aisSearchPath +
+                        agoData.features[0].attributes.ADDRESS +
+                        "?gatekeeperKey=" +
+                        _this.settings.gateKeeperKey
+                    );
+                    aisAddressRequest.then(
+                        lang.hitch(this, function (result) {
+                            var aisData = JSON.parse(result);
+                            updateDataAndZoom(aisData, agoData, _this);
+                        })
+                    );
+                }
+
+                function processAisDataOnSuccess(agoData, _this, aisDataJson) {
+                    var aisData = JSON.parse(aisDataJson);
+                    updateDataAndZoom(aisData, agoData, _this);
+                }
+            },
             // get subject
             _getSubject: function _getSubject(gra) {
                 var attr = this._getAttributes(gra.properties);
+
                 this.subject = {
                     address: attr[0]
                 };
             },
-
             // get council
             _getCouncil: function _getCouncil(geom) {
                 var query = new Query();
@@ -373,6 +421,7 @@ define([
                     lang.hitch(this, function (results) {
                         var str = "";
                         var features = results.features;
+
                         if (features.length > 0) {
                             var list = [];
                             array.forEach(features, function (f) {
@@ -380,12 +429,13 @@ define([
                             });
                             str = list.join(", ");
                         }
+
                         this.subject.council = str;
+
                         this._updateSubject();
                     })
                 );
             },
-
             // get rco
             _getRCO: function _getRCO(geom) {
                 var query = new Query();
@@ -399,6 +449,7 @@ define([
                     lang.hitch(this, function (results) {
                         var str = "";
                         var features = results.features;
+
                         if (features.length > 0) {
                             var list = [];
                             array.forEach(features, function (f) {
@@ -406,8 +457,10 @@ define([
                             });
                             str = list.join(", ");
                         }
+
                         this.subject.rco = str;
                         this.subject.rcoInfo = this._getRCOInfo(features);
+
                         this._updateSubject();
                     })
                 );
@@ -419,18 +472,19 @@ define([
                 info += flds.join(",") + "\n";
                 array.forEach(features, function (f) {
                     var attr = f.attributes;
+
                     for (var i = 0; i < flds.length; i++) {
                         info += '"' + attr[flds[i]] + '"';
+
                         if (i < flds.length - 1) {
                             info += ",";
                         }
                     }
+
                     info += "\n";
                 });
-
                 return info;
             },
-
             // update subject
             _updateSubject: function _updateSubject() {
                 if (this.subject) {
@@ -442,7 +496,6 @@ define([
                         "<span class='fld'>RCO</span>: " + this.subject.rco;
                 }
             },
-
             _getAttributes: function _getAttributes(attr) {
                 var addr = attr.street_address || "";
                 var city = "Philadelphia";
@@ -450,7 +503,6 @@ define([
                 var ZIP = (attr.zip_code ? attr.zip_code.substring(0, 5) : "") || "";
                 return [addr, city, state, ZIP];
             },
-
             // buffer property
             _bufferProperty: function _bufferProperty(geom) {
                 // subject
@@ -464,14 +516,16 @@ define([
                 var graSubj = new Graphic({
                     geometry: geom,
                     symbol: symSubj
-                });
-                // buffer
+                }); // buffer
+
                 var buffer = geometryEngine.geodesicBuffer(
                     geom,
                     this.settings.distance,
                     "feet"
                 );
+
                 this._selectParcels(buffer);
+
                 var rgba1 = this.settings.color.slice();
                 rgba1.push(0.2);
                 var rgba2 = this.settings.color.slice();
@@ -486,8 +540,8 @@ define([
                 var graBuffer = new Graphic({
                     geometry: buffer,
                     symbol: symBuffer
-                });
-                // centroid
+                }); // centroid
+
                 var pt = buffer.centroid;
                 var symPt = new SimpleMarkerSymbol({
                     color: this.settings.color,
@@ -499,8 +553,8 @@ define([
                 var graPt = new Graphic({
                     geometry: pt,
                     symbol: symPt
-                });
-                // marker
+                }); // marker
+
                 var sym = new PictureMarkerSymbol({
                     url: "images/pin.png",
                     width: "24px",
@@ -512,7 +566,6 @@ define([
                 });
                 this.lyrGraphics.addMany([graSubj, graBuffer, graPt, gra]);
             },
-
             // select parcels
             _selectParcels: function _selectParcels(geom) {
                 var pwdQuery = new Query();
@@ -523,7 +576,6 @@ define([
                 pwdQuery.returnGeometry = false;
                 pwdQuery.outFields = ["BRT_ID"];
                 pwdQuery.outSpatialReference = this.view.spatialReference;
-
                 pwdQueryTask.execute(pwdQuery).then(
                     lang.hitch(this, function (results) {
                         var opaQuery = new Query();
@@ -552,13 +604,13 @@ define([
                                         }
                                     };
                                 });
+
                                 this._updateStats(this.features);
                             })
                         );
                     })
                 );
             },
-
             // zoom to
             _zoomTo: function _zoomTo(pt) {
                 pt.longitude = pt.longitude - 0.001;
@@ -567,7 +619,6 @@ define([
                     zoom: 17
                 });
             },
-
             // update stats
             _updateStats: function _updateStats(features) {
                 dom.byId("boxNum").innerHTML = features.length;
@@ -575,7 +626,6 @@ define([
                 domStyle.set("boxNum", "display", "block");
                 domStyle.set("boxLabel", "display", "block");
                 domStyle.set("boxDownload", "display", style);
-
                 var sym = new SimpleFillSymbol({
                     color: [0, 0, 0, 0.15],
                     outline: {
@@ -593,10 +643,11 @@ define([
                         this.lyrParcels.add(g);
                     })
                 );
+
                 this._checkHistory();
+
                 domClass.add("boxResults", "opened");
             },
-
             // clear
             _clear: function _clear() {
                 this.features = [];
@@ -608,54 +659,60 @@ define([
                 dom.byId("boxRCO").innerHTML = "";
                 domClass.remove("boxResults", "opened");
             },
-
             //* CSV *//
-
             // check history
             _checkHistory: function _checkHistory() {
                 var num = 0;
+
                 if (cookie("dwn")) {
                     num = parseInt(cookie("dwn"), 10);
                 }
+
                 if (num < 50) {
                     domStyle.set("btnCSV", "display", "block");
                     domStyle.set("btnMax", "display", "none");
                     return true;
                 }
+
                 domStyle.set("btnCSV", "display", "none");
                 domStyle.set("btnMax", "display", "block");
                 return false;
             },
-
             // update history
             _updateHistory: function _updateHistory() {
                 var num = 0;
+
                 if (cookie("dwn")) {
                     num = parseInt(cookie("dwn"), 10);
                 }
+
                 num += 1;
-                cookie("dwn", num, { expires: 1 });
+                cookie("dwn", num, {
+                    expires: 1
+                });
+
                 if (num >= 50) {
                     domStyle.set("btnCSV", "display", "none");
                     domStyle.set("btnMax", "display", "block");
                 }
             },
-
             // download click
             _downloadClick: function _downloadClick() {
                 if (this.timer) {
                     clearTimeout(this.timer);
                     this.timer = null;
                 }
+
                 dom.byId("btnCSV").innerHTML = "Preparing Download...";
                 this.timer = setTimeout(lang.hitch(this, this._downloadCSV), 3000);
             },
-
             _downloadCSV: function _downloadCSV() {
                 var chk = this._checkHistory();
+
                 if (!chk) {
                     return;
                 }
+
                 this._updateHistory();
 
                 var content = "";
@@ -664,12 +721,14 @@ define([
                     this.features,
                     lang.hitch(this, function (f) {
                         var attr = this._getAttributes(f.attributes);
+
                         content += attr.join(",") + "\n";
                     })
                 );
                 var fileName = "NotifyAddressList.csv";
                 var mimeType = "application/octet-stream";
                 var a = document.createElement("a");
+
                 if (navigator.msSaveBlob) {
                     // IE10
                     navigator.msSaveBlob(
@@ -693,14 +752,15 @@ define([
                     location.href =
                         "data:application/octet-stream," + encodeURIComponent(content); // only this mime type is supported
                 }
+
                 dom.byId("btnCSV").innerHTML = "DOWNLOAD ADDRESS LIST";
             },
-
             _downloadRCO: function _downloadRCO() {
                 var content = this.subject.rcoInfo;
                 var fileName = "rco.csv";
                 var mimeType = "application/octet-stream";
                 var a = document.createElement("a");
+
                 if (navigator.msSaveBlob) {
                     // IE10
                     navigator.msSaveBlob(
@@ -725,9 +785,7 @@ define([
                         "data:application/octet-stream," + encodeURIComponent(content); // only this mime type is supported
                 }
             },
-
             //* ABOUT *//
-
             // toggle about
             _toggleAbout: function _toggleAbout() {
                 var splash = dom.byId("splashScreen");
@@ -740,7 +798,6 @@ define([
                     domStyle.set(splash, "z-index", 10);
                 }
             },
-
             // send email
             _sendEmail: function _sendEmail() {
                 var url =

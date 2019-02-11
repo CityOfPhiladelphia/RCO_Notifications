@@ -1,12 +1,11 @@
 {
-  "name": "RCO_Notifications",
-  "version": "1.0.1",
+  "name": "rco_notifications",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "dependencies": {
     "phila-standards": "^1.0.2"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CityOfPhiladelphia/RCO_Notifications.git"
