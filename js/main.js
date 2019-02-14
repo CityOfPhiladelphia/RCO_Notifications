@@ -274,7 +274,8 @@ define([
                     allPlaceholder: "Enter Address",
                     sources: sources,
                     autoSelect: false,
-                    includeDefaultSources: false
+                    includeDefaultSources: false,
+                    locationEnabled: false
                 });
                 this.searchWidget.allPlaceholder = "Enter Address";
                 on(
@@ -322,7 +323,7 @@ define([
                 });
                 query.geometry = pt;
                 query.returnGeometry = true;
-                query.outFields = ["*"];
+                query.outFields = ["ADDRESS"];
                 query.outSpatialReference = this.view.spatialReference;
                 var agoRequest = queryTask.execute(query);
                 var aisRequest = request(
@@ -355,7 +356,7 @@ define([
                         var aisFeature = aisResult.features[0];
                         var agoFeature = agoResult.features[0];
 
-                        _this._getSubject(aisFeature);
+                        _this._getSubject(aisFeature, agoFeature);
 
                         _this._getCouncil(agoFeature.geometry);
 
@@ -401,8 +402,15 @@ define([
                 }
             },
             // get subject
-            _getSubject: function _getSubject(gra) {
-                var attr = this._getAttributes(gra.properties);
+            _getSubject: function _getSubject(ais, ago) {
+                var mergedAttributes = [ais.properties, ago.attributes].reduce(function (r, o) {
+                    Object.keys(o).forEach(function (k) {
+                        r[k] = o[k];
+                    });
+                    return r;
+                }, {});
+
+                var attr = this._getAttributes(mergedAttributes);
 
                 this.subject = {
                     address: attr[0]
@@ -416,7 +424,7 @@ define([
                 });
                 query.geometry = geom;
                 query.returnGeometry = false;
-                query.outFields = ["*"];
+                query.outFields = ["DISTRICT"];
                 queryTask.execute(query).then(
                     lang.hitch(this, function (results) {
                         var str = "";
@@ -444,7 +452,7 @@ define([
                 });
                 query.geometry = geom;
                 query.returnGeometry = false;
-                query.outFields = ["*"];
+                query.outFields = this.settings.rcoFields;
                 queryTask.execute(query).then(
                     lang.hitch(this, function (results) {
                         var str = "";
@@ -497,7 +505,7 @@ define([
                 }
             },
             _getAttributes: function _getAttributes(attr) {
-                var addr = attr.street_address || "";
+                var addr = attr.ADDRESS || attr.street_address || "";
                 var city = "Philadelphia";
                 var state = "PA";
                 var ZIP = (attr.zip_code ? attr.zip_code.substring(0, 5) : "") || "";

@@ -349,10 +349,10 @@
         var head = document.getElementsByTagName('head')[0];
         var file;
         var link;
-        var versionNumberNew = 'v1.0.3';
+        var versionNumberNew = 'v1.0.4';
 
         for (i = 0; i < sourceElements.length; i++) {
-            var contentTypeIsJs = sourceElements[i].startsWith("js");
+            var contentTypeIsJs = sourceElements[i].lastIndexOf("js", 0) === 0;
             if (contentTypeIsJs) {
                 file = document.createElement('script');
                 file.type = 'text/javascript';
@@ -369,6 +369,7 @@
 
         var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
         var dojoConfig = {
+            has: { "esri-featurelayer-webgl": 1 },
             // The locationPath logic below may look confusing but all its doing is
             // enabling us to load the api from a CDN and load local modules from the correct location.
             cacheBust: versionNumberNew,
@@ -377,13 +378,14 @@
                 location: package_path + '/js'
             }]
         };
+
     </script>
     <!-- ESRI -->
     <script type="text/javascript" src="//js.arcgis.com/4.10/"></script>
     <script type="text/javascript">
         require([
-            `app/settings`,
-            `app/main`
+            'app/settings',
+            'app/main'
         ], function (
             settings,
             Main
