@@ -16,6 +16,7 @@ define([
     "dojo/on",
     "dojo/request",
     "esri/geometry/geometryEngine",
+    "esri/geometry/Point",
     "esri/Graphic",
     "esri/layers/GraphicsLayer",
     "esri/symbols/PictureMarkerSymbol",
@@ -44,6 +45,7 @@ define([
     on,
     request,
     geometryEngine,
+    Point,
     Graphic,
     GraphicsLayer,
     PictureMarkerSymbol,
@@ -300,11 +302,27 @@ define([
                     var results = geoResults.results;
 
                     if (results.length > 0) {
-                        // get last record, incase 2nd record in array
-                        var rec = results[results.length - 1];
+                        var rec = results.filter(function (i) {
+                            // look for results with zip first, as this record contains more accurate xy coordinates
+                            return i.name.includes(",");
+                        })[0] || results[0];
                         var pt = rec.feature.geometry;
 
-                        this._selectProperty(pt, true);
+                        this._selectProperty(pt, true, rec);
+                    }
+                    else {
+                        request(
+                            this.settings.aisApiUrl +
+                            this.settings.aisSearchPath +
+                            evt.searchTerm +
+                            "?gatekeeperKey=" +
+                            this.settings.gateKeeperKey
+                        ).then(lang.hitch(this, function (result) {
+                            var rec = JSON.parse(result);
+                            var pt = new Point(rec.features[0].geometry.coordinates);
+
+                            this._searchWithAisInfo(pt, rec, true);
+                        }));
                     }
                 }
             },
@@ -313,96 +331,68 @@ define([
                 this._clear();
             },
             // select property
-            _selectProperty: function _selectProperty(pt, zoom) {
+            _selectProperty: function _selectProperty(pt, zoom, searchResult) {
                 this._clear();
 
                 var latLng = [pt.longitude, pt.latitude];
+
+                request(
+                    this.settings.aisApiUrl +
+                    this.settings.aisSearchPath +
+                    (searchResult && searchResult.name || latLng) +
+                    "?gatekeeperKey=" +
+                    this.settings.gateKeeperKey
+                ).then(
+                    // found
+                    lang.hitch(this, function (result) {
+                        var aisResult = JSON.parse(result);
+
+                        this._searchWithAisInfo(pt, aisResult, zoom);
+                    }),
+
+                    // not found
+                    lang.hitch(this, function (error) {
+                        this._searchWithAisInfo(pt, undefined, zoom);
+                    })
+                );
+            },
+            _searchWithAisInfo: function _searchWithAisInfo(pt, aisResult, zoom) {
+                var aisFeature = aisResult && aisResult.features.filter(function (i) {
+                    return i.match_type === "exact";
+                })[0];
                 var query = new Query();
                 var queryTask = new QueryTask({
                     url: this.settings.parcelsUrl
                 });
-                query.geometry = pt;
+                if (aisFeature && aisFeature.properties.opa_account_num) {
+                    query.where = "BRT_ID=" + "'" + aisFeature.properties.opa_account_num + "'";
+                }
+                else {
+                    query.geometry = pt;
+                }
                 query.returnGeometry = true;
                 query.outFields = ["ADDRESS"];
                 query.outSpatialReference = this.view.spatialReference;
-                var agoRequest = queryTask.execute(query);
-                var aisRequest = request(
-                    this.settings.aisApiUrl +
-                    this.settings.aisReverseGeocodePath +
-                    latLng +
-                    "?gatekeeperKey=" +
-                    this.settings.gateKeeperKey
-                );
-                aisRequest.then(
-                    // success
-                    lang.hitch(this, function (result) {
-                        requestAgoInfo(
-                            agoRequest,
-                            function (agoData, _this) {
-                                processAisDataOnSuccess(agoData, _this, result);
-                            },
-                            this
-                        );
-                    }), // error / not found
-                    lang.hitch(this, function (error) {
-                        requestAgoInfo(agoRequest, queryAisByAddressOnFail, this);
-                    })
-                );
+                queryTask.execute(query).then(lang.hitch(this, function (agoResult) {
+                    var agoFeature = agoResult.features[0];
+                    this._getSubject(aisFeature, agoFeature);
 
-                function updateDataAndZoom(aisResult, agoResult, _this) {
-                    var features = aisResult.features;
+                    this._getCouncil(agoFeature.geometry);
 
-                    if (features.length > 0) {
-                        var aisFeature = aisResult.features[0];
-                        var agoFeature = agoResult.features[0];
+                    this._getRCO(agoFeature.geometry);
 
-                        _this._getSubject(aisFeature, agoFeature);
+                    this._bufferProperty(agoFeature.geometry);
 
-                        _this._getCouncil(agoFeature.geometry);
-
-                        _this._getRCO(agoFeature.geometry);
-
-                        _this._bufferProperty(agoFeature.geometry);
-
-                        _this._updateSubject();
-                    }
+                    this._updateSubject();
 
                     if (zoom) {
-                        _this._zoomTo(pt);
+                        this._zoomTo(pt);
                     }
-                }
-
-                function requestAgoInfo(agoRequest, resultFunction, _this) {
-                    agoRequest.then(
-                        lang.hitch(this, function (result) {
-                            resultFunction(result, _this, arguments[0]);
-                        })
-                    );
-                }
-
-                function queryAisByAddressOnFail(agoData, _this) {
-                    var aisAddressRequest = request(
-                        _this.settings.aisApiUrl +
-                        _this.settings.aisSearchPath +
-                        agoData.features[0].attributes.ADDRESS +
-                        "?gatekeeperKey=" +
-                        _this.settings.gateKeeperKey
-                    );
-                    aisAddressRequest.then(
-                        lang.hitch(this, function (result) {
-                            var aisData = JSON.parse(result);
-                            updateDataAndZoom(aisData, agoData, _this);
-                        })
-                    );
-                }
-
-                function processAisDataOnSuccess(agoData, _this, aisDataJson) {
-                    var aisData = JSON.parse(aisDataJson);
-                    updateDataAndZoom(aisData, agoData, _this);
-                }
+                }));
             },
             // get subject
             _getSubject: function _getSubject(ais, ago) {
+                ais = ais || { properties: [] };
                 var mergedAttributes = [ais.properties, ago.attributes].reduce(function (r, o) {
                     Object.keys(o).forEach(function (k) {
                         r[k] = o[k];
