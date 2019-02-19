@@ -304,7 +304,7 @@ define([
                     if (results.length > 0) {
                         var rec = results.filter(function (i) {
                             // look for results with zip first, as this record contains more accurate xy coordinates
-                            return i.name.includes(",");
+                            return i.name.indexOf(",") >= 0;
                         })[0] || results[0];
                         var pt = rec.feature.geometry;
 
@@ -332,8 +332,6 @@ define([
             },
             // select property
             _selectProperty: function _selectProperty(pt, zoom, searchResult) {
-                this._clear();
-
                 var latLng = [pt.longitude, pt.latitude];
 
                 request(
@@ -357,6 +355,8 @@ define([
                 );
             },
             _searchWithAisInfo: function _searchWithAisInfo(pt, aisResult, zoom) {
+                this._clear();
+              
                 var aisFeature = aisResult && aisResult.features.filter(function (i) {
                     return i.match_type === "exact";
                 })[0];
