@@ -127,7 +127,6 @@ define([
             // ** MAP ** //
             // init map
             _initMap: function _initMap() {
-                console.log(this.settings);
                 var webmap = new WebMap({
                     portalItem: {
                         id: this.settings.webmap
@@ -302,10 +301,24 @@ define([
                     var results = geoResults.results;
 
                     if (results.length > 0) {
-                        var rec = results.filter(function (i) {
-                            // look for results with zip first, as this record contains more accurate xy coordinates
-                            return i.name.indexOf(",") >= 0;
-                        })[0] || results[0];
+                        var rankedResults = results.map(function (result) {
+                            var rank;
+                            if (result.name === evt.searchTerm && result.name.indexOf(",") >= 0) {
+                                rank = 1;
+                            }
+                            else if (result.name.indexOf(evt.searchTerm) >= 0) {
+                                rank = 2;
+                            }
+                            else if (result.name.indexOf(",") >= 0) {
+                                rank = 3;
+                            }
+                            else {
+                                rank = 4;
+                            }
+                            result.rank = rank;
+                            return result;
+                        })
+                        var rec = rankedResults.slice(0).sort((a, b) => a.rank - b.rank)[0];
                         var pt = rec.feature.geometry;
 
                         this._selectProperty(pt, true, rec);
@@ -356,7 +369,7 @@ define([
             },
             _searchWithAisInfo: function _searchWithAisInfo(pt, aisResult, zoom) {
                 this._clear();
-              
+
                 var aisFeature = aisResult && aisResult.features.filter(function (i) {
                     return i.match_type === "exact";
                 })[0];
