@@ -315,27 +315,31 @@ define([
                             else {
                                 rank = 4;
                             }
+
                             result.rank = rank;
                             return result;
-                        })
-                        var rec = rankedResults.slice(0).sort((a, b) => a.rank - b.rank)[0];
+                        });
+                        var rec = rankedResults.slice(0).sort(function (a, b) {
+                            return a.rank - b.rank;
+                        })[0];
                         var pt = rec.feature.geometry;
 
                         this._selectProperty(pt, true, rec);
-                    }
-                    else {
+                    } else {
                         request(
                             this.settings.aisApiUrl +
                             this.settings.aisSearchPath +
                             evt.searchTerm +
                             "?gatekeeperKey=" +
                             this.settings.gateKeeperKey
-                        ).then(lang.hitch(this, function (result) {
-                            var rec = JSON.parse(result);
-                            var pt = new Point(rec.features[0].geometry.coordinates);
+                        ).then(
+                            lang.hitch(this, function (result) {
+                                var rec = JSON.parse(result);
+                                var pt = new Point(rec.features[0].geometry.coordinates);
 
-                            this._searchWithAisInfo(pt, rec, true);
-                        }));
+                                this._searchWithAisInfo(pt, rec, true);
+                            })
+                        );
                     }
                 }
             },
@@ -346,11 +350,10 @@ define([
             // select property
             _selectProperty: function _selectProperty(pt, zoom, searchResult) {
                 var latLng = [pt.longitude, pt.latitude];
-
                 request(
                     this.settings.aisApiUrl +
                     this.settings.aisSearchPath +
-                    (searchResult && searchResult.name || latLng) +
+                    ((searchResult && searchResult.name) || latLng) +
                     "?gatekeeperKey=" +
                     this.settings.gateKeeperKey
                 ).then(
@@ -360,7 +363,6 @@ define([
 
                         this._searchWithAisInfo(pt, aisResult, zoom);
                     }),
-
                     // not found
                     lang.hitch(this, function (error) {
                         this._searchWithAisInfo(pt, undefined, zoom);
@@ -370,48 +372,56 @@ define([
             _searchWithAisInfo: function _searchWithAisInfo(pt, aisResult, zoom) {
                 this._clear();
 
-                var aisFeature = aisResult && aisResult.features.filter(function (i) {
-                    return i.match_type === "exact";
-                })[0];
+                var aisFeature =
+                    aisResult &&
+                    aisResult.features.filter(function (i) {
+                        return i.match_type === "exact";
+                    })[0];
                 var query = new Query();
                 var queryTask = new QueryTask({
                     url: this.settings.parcelsUrl
                 });
+
                 if (aisFeature && aisFeature.properties.opa_account_num) {
                     query.where = "BRT_ID=" + "'" + aisFeature.properties.opa_account_num + "'";
                 }
                 else {
                     query.geometry = pt;
                 }
+
                 query.returnGeometry = true;
                 query.outFields = ["ADDRESS"];
                 query.outSpatialReference = this.view.spatialReference;
-                queryTask.execute(query).then(lang.hitch(this, function (agoResult) {
-                    var agoFeature = agoResult.features[0];
-                    this._getSubject(aisFeature, agoFeature);
+                queryTask.execute(query)
+                    .then(lang.hitch(this, function (agoResult) {
+                        var agoFeature = agoResult.features[0];
 
-                    this._getCouncil(agoFeature.geometry);
+                        this._getSubject(aisFeature, agoFeature);
 
-                    this._getRCO(agoFeature.geometry);
+                        this._getCouncil(agoFeature.geometry);
 
-                    this._bufferProperty(agoFeature.geometry);
+                        this._getRCO(agoFeature.geometry);
 
-                    this._updateSubject();
+                        this._bufferProperty(agoFeature.geometry);
 
-                    if (zoom) {
-                        this._zoomTo(pt);
-                    }
-                }));
+                        this._updateSubject();
+
+                        if (zoom) {
+                            this._zoomTo(pt);
+                        }
+                    })
+                    );
             },
             // get subject
             _getSubject: function _getSubject(ais, ago) {
                 ais = ais || { properties: [] };
-                var mergedAttributes = [ais.properties, ago.attributes].reduce(function (r, o) {
-                    Object.keys(o).forEach(function (k) {
-                        r[k] = o[k];
-                    });
-                    return r;
-                }, {});
+                var mergedAttributes =
+                    [ais.properties, ago.attributes].reduce(function (r, o) {
+                        Object.keys(o).forEach(function (k) {
+                            r[k] = o[k];
+                        });
+                        return r;
+                    }, {});
 
                 var attr = this._getAttributes(mergedAttributes);
 
