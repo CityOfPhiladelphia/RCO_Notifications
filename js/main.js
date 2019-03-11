@@ -377,40 +377,54 @@ define([
                     aisResult.features.filter(function (i) {
                         return i.match_type === "exact";
                     })[0];
+
+                this._getAgoData(aisFeature, true, pt);
+
+                if (zoom) {
+                    this._zoomTo(pt);
+                }
+            },
+            _getAgoData: function _getAgoData(aisFeature, pwd, pt) {
                 var query = new Query();
                 var queryTask = new QueryTask({
-                    url: this.settings.parcelsUrl
+                    url: pwd ? this.settings.parcelsUrl : this.settings.dorParcelsUrl
                 });
 
-                if (aisFeature && aisFeature.properties.opa_account_num) {
-                    query.where = "BRT_ID=" + "'" + aisFeature.properties.opa_account_num + "'";
-                }
-                else {
+                if (
+                    aisFeature &&
+                    (pwd
+                        ? aisFeature.properties.opa_account_num
+                        : aisFeature.properties.dor_parcel_id)
+                ) {
+                    query.where = pwd
+                        ? "BRT_ID=" + "'" + aisFeature.properties.opa_account_num + "'"
+                        : "MAPREG=" + "'" + aisFeature.properties.dor_parcel_id + "'";
+                } else {
                     query.geometry = pt;
                 }
 
                 query.returnGeometry = true;
-                query.outFields = ["ADDRESS"];
+                query.outFields = pwd ? ["ADDRESS"] : ["ADDR_SOURCE"];
                 query.outSpatialReference = this.view.spatialReference;
-                queryTask.execute(query)
-                    .then(lang.hitch(this, function (agoResult) {
+                queryTask.execute(query).then(
+                    lang.hitch(this, function (agoResult) {
                         var agoFeature = agoResult.features[0];
 
-                        this._getSubject(aisFeature, agoFeature);
+                        if (agoFeature) {
+                            this._getSubject(aisFeature, agoFeature);
 
-                        this._getCouncil(agoFeature.geometry);
+                            this._getCouncil(agoFeature.geometry);
 
-                        this._getRCO(agoFeature.geometry);
+                            this._getRCO(agoFeature.geometry);
 
-                        this._bufferProperty(agoFeature.geometry);
+                            this._bufferProperty(agoFeature.geometry);
 
-                        this._updateSubject();
-
-                        if (zoom) {
-                            this._zoomTo(pt);
+                            this._updateSubject();
+                        } else {
+                            this._getAgoData(aisFeature, false, pt);
                         }
                     })
-                    );
+                );
             },
             // get subject
             _getSubject: function _getSubject(ais, ago) {
