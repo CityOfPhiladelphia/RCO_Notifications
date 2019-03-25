@@ -404,7 +404,9 @@ define([
                 }
 
                 query.returnGeometry = true;
-                query.outFields = pwd ? ["ADDRESS"] : ["ADDR_SOURCE"];
+                query.outFields = pwd
+                    ? ["ADDRESS", "TENCODE"]
+                    : ["ADDR_SOURCE", "STCOD", "HOUSE"];
                 query.outSpatialReference = this.view.spatialReference;
                 queryTask.execute(query).then(
                     lang.hitch(this, function (agoResult) {
@@ -417,7 +419,14 @@ define([
 
                             this._getRCO(agoFeature.geometry);
 
-                            this._bufferProperty(agoFeature.geometry);
+                            var tenCode =
+                                (aisFeature && aisFeature.properties.pwd_account_nums[0]) ||
+                                agoFeature.attributes.TENCODE ||
+                                "" +
+                                agoFeature.attributes.STCOD +
+                                ("00000" + agoFeature.attributes.HOUSE).slice(-5);
+
+                            this._bufferProperty(agoFeature.geometry, tenCode);
 
                             this._updateSubject();
                         } else {
@@ -428,14 +437,19 @@ define([
             },
             // get subject
             _getSubject: function _getSubject(ais, ago) {
-                ais = ais || { properties: [] };
-                var mergedAttributes =
-                    [ais.properties, ago.attributes].reduce(function (r, o) {
-                        Object.keys(o).forEach(function (k) {
-                            r[k] = o[k];
-                        });
-                        return r;
-                    }, {});
+                ais = ais || {
+                    properties: []
+                };
+                var mergedAttributes = [ais.properties, ago.attributes].reduce(function (
+                    r,
+                    o
+                ) {
+                    Object.keys(o).forEach(function (k) {
+                        r[k] = o[k];
+                    });
+                    return r;
+                },
+                    {});
 
                 var attr = this._getAttributes(mergedAttributes);
 
@@ -539,7 +553,17 @@ define([
                 return [addr, city, state, ZIP];
             },
             // buffer property
-            _bufferProperty: function _bufferProperty(geom) {
+            _bufferProperty: function _bufferProperty(geom, tenCode) {
+                var buffer = geometryEngine.geodesicBuffer(
+                    geom,
+                    this.settings.distance,
+                    "feet"
+                );
+
+                this._selectParcels(geom, buffer, tenCode);
+            },
+            // draw
+            _draw: function _draw(subject, buffer, notifyGeom) {
                 // subject
                 var symSubj = new SimpleFillSymbol({
                     color: [255, 255, 255, 0.5],
@@ -549,17 +573,9 @@ define([
                     }
                 });
                 var graSubj = new Graphic({
-                    geometry: geom,
+                    geometry: subject,
                     symbol: symSubj
                 }); // buffer
-
-                var buffer = geometryEngine.geodesicBuffer(
-                    geom,
-                    this.settings.distance,
-                    "feet"
-                );
-
-                this._selectParcels(buffer);
 
                 var rgba1 = this.settings.color.slice();
                 rgba1.push(0.2);
@@ -599,27 +615,65 @@ define([
                     geometry: pt,
                     symbol: sym
                 });
-                this.lyrGraphics.addMany([graSubj, graBuffer, graPt, gra]);
+                var notifySymbol = new SimpleFillSymbol({
+                    color: [255, 0, 0, 0.1],
+                    outline: {
+                        color: [0, 0, 0, 0.7],
+                        width: 1
+                    }
+                });
+                var graSelected = new Graphic({
+                    geometry: notifyGeom,
+                    symbol: notifySymbol
+                }); // buffer
+
+                this.lyrGraphics.addMany([graSelected, graSubj, graBuffer, graPt, gra]);
+
+                this._extentChange();
             },
             // select parcels
-            _selectParcels: function _selectParcels(geom) {
+            _selectParcels: function _selectParcels(subject, geom, tenCode) {
+                var byGeom,
+                    byBlock,
+                    queries = [];
+                this.features = [];
+                var block = tenCode.substring(0, 8);
                 var pwdQuery = new Query();
                 var pwdQueryTask = new QueryTask({
                     url: this.settings.parcelsUrl
                 });
+                var blockQuery = new Query();
+                var blockQueryTask = new QueryTask({
+                    url: this.settings.parcelsUrl
+                });
                 pwdQuery.geometry = geom;
-                pwdQuery.returnGeometry = false;
-                pwdQuery.outFields = ["BRT_ID"];
+                blockQuery.where = "TENCODE LIKE '" + block + "__'";
+                pwdQuery.returnGeometry = blockQuery.returnGeometry = true;
+                pwdQuery.outFields = blockQuery.outFields = ["BRT_ID"];
                 pwdQuery.outSpatialReference = this.view.spatialReference;
-                pwdQueryTask.execute(pwdQuery).then(
-                    lang.hitch(this, function (results) {
+                byGeom = pwdQueryTask.execute(pwdQuery);
+                byBlock = blockQueryTask.execute(blockQuery);
+                queries = new all([byGeom, byBlock]);
+                queries.then(
+                    lang.hitch(this, function (resultSet) {
+                        var results = distinctArray(
+                            resultSet[0].features.concat(resultSet[1].features)
+                        );
+                        var notifyGeom = geometryEngine.union(
+                            results.map(function (feature) {
+                                return feature.geometry;
+                            })
+                        );
+
+                        this._draw(subject, geom, notifyGeom);
+
                         var opaQuery = new Query();
                         var opaQueryTask = new QueryTask({
                             url: this.settings.opaPropertiesUrl
                         });
                         opaQuery.where =
                             "PARCEL_NUMBER IN (" +
-                            results.features
+                            results
                                 .map(function (x) {
                                     return "'" + x.attributes.BRT_ID + "'";
                                 })
@@ -841,3 +895,15 @@ define([
             }
         });
     });
+
+function distinctArray(array) {
+    var a = array.concat();
+
+    for (var i = 0; i < a.length; ++i) {
+        for (var j = i + 1; j < a.length; ++j) {
+            if (a[i] === a[j]) a.splice(j--, 1);
+        }
+    }
+
+    return a;
+}

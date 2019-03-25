@@ -252,7 +252,7 @@ input:focus {
 }
 
 #boxResults.opened {
-    height: 300px;
+    height: auto;
     margin-top: 10px;
 }
 
@@ -272,7 +272,7 @@ input:focus {
 
 #boxDownload {
     clear: both;
-    height: 30px;
+    height: auto;
     line-height: 30px;
     text-align: center;
     display: block;
