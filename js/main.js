@@ -547,6 +547,11 @@ define([
             },
             _getAttributes: function _getAttributes(attr) {
                 var addr = attr.ADDRESS || attr.street_address || "";
+                if (attr.unit) {
+                    var truncatedUnit = attr.unit.replace(/^0+/, '');
+                    addr += " " + truncatedUnit;
+                }
+
                 var city = "Philadelphia";
                 var state = "PA";
                 var ZIP = (attr.zip_code ? attr.zip_code.substring(0, 5) : "") || "";
@@ -680,7 +685,7 @@ define([
                                 .join(",") +
                             ")";
                         opaQuery.returnGeometry = false;
-                        opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE"];
+                        opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT"];
                         opaQuery.outSpatialReference = this.view.spatialReference;
                         opaQueryTask.execute(opaQuery).then(
                             lang.hitch(this, function (opaResults) {
@@ -689,7 +694,8 @@ define([
                                         attributes: {
                                             street_address: feature.attributes.LOCATION,
                                             parcel_number: feature.attributes.PARCEL_NUMBER,
-                                            zip_code: feature.attributes.ZIP_CODE
+                                            zip_code: feature.attributes.ZIP_CODE,
+                                            unit: feature.attributes.UNIT
                                         }
                                     };
                                 });

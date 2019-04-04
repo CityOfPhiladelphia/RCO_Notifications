@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RCO Notifications | City Of Philadelphia</title>
     <link rel="stylesheet" type="text/css"
-        href="https://unpkg.com/phila-standards@1.0.2/dist/css/phila-standards.min.css">
+        href="https://unpkg.com/phila-standards@1.1.1/dist/css/phila-standards.min.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.7.2/css/all.css"
         integrity="sha384-6jHF7Z3XI3fF4XZixAuSu0gGKrXwoX/w3uFPxC56OtjChio7wtTGJWRW53Nhx6Ev" crossorigin="anonymous">
-    <link rel="stylesheet" href="//js.arcgis.com/4.10/esri/css/main.css">
-    <link rel="shortcut icon" type="image/x-icon" href="https://unpkg.com/phila-standards@1.0.2/dist/img/favicon.png">
+    <link rel="stylesheet" href="//js.arcgis.com/4.11/esri/css/main.css">
+    <link rel="shortcut icon" type="image/x-icon" href="https://unpkg.com/phila-standards@1.1.1/dist/img/favicon.png">
     <meta name="twitter:card" content="summary">
     <meta property="og:title" content="">
     <meta property="og:description" content="">
@@ -60,18 +60,26 @@
                                                 <a href="#" data-toggle="lnkInstruction">Instructions</a>
                                                 <div class="dropdown-pane" id="lnkInstruction" data-dropdown
                                                     data-hover="true" data-hover-pane="true">
-                                                    <ul class="vertical menu pan">
+                                                    <ul class="vertical menu accordian-menu pan" data-accordion-menu>
                                                         <li>
                                                             <a href="#">Detailed Instructions</a>
-                                                            <ul class="nested vertical menu">
+                                                            <ul class="menu vertical nested pan">
                                                                 <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/Applicant_Detailed_Instructions.pdf"
                                                                         target="_blank">> For Applicants</a></li>
                                                                 <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/RCO_Detailed_Instructions.pdf"
                                                                         target="_blank">> For RCOs</a></li>
                                                             </ul>
                                                         </li>
-                                                        <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/APPLICANT_NOTIFICATION_TEMPLATES.pdf"
-                                                                target="_blank">Template for Applicants</a></li>
+                                                        <li>
+                                                            <a href="#">Template for Applicants</a>
+                                                            <ul class="menu vertical nested pan">
+                                                                <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/APPLICANT_NOTIFICATION_TEMPLATES.pdf"
+                                                                        target="_blank">.PDF</a></li>
+                                                                <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/APPLICANT_NOTIFICATION_TEMPLATES.docx"
+                                                                        target="_blank">.DOCX</a></li>
+                                                            </ul>
+                                                        </li>
+
                                                         <li><a href="//www.phila.gov/CityPlanning/projectreviews/RCO%20Related/Meeting_Summary_Template.pdf"
                                                                 target="_blank">Meeting Summary Form for RCOs</a></li>
                                                     </ul>
@@ -329,7 +337,7 @@
             </div>
         </div>
     </footer>
-    <script src="https://unpkg.com/phila-standards@1.0.2/dist/js/phila-standards.min.js"></script>
+    <script src="https://unpkg.com/phila-standards@1.1.1/dist/js/phila-standards.min.js"></script>
     <script>
         $(document).foundation();
     </script>
@@ -349,7 +357,7 @@
         var head = document.getElementsByTagName('head')[0];
         var file;
         var link;
-        var versionNumberNew = 'v1.1.0';
+        var versionNumberNew = 'v1.1.1';
 
         for (i = 0; i < sourceElements.length; i++) {
             var contentTypeIsJs = sourceElements[i].lastIndexOf("js", 0) === 0;
@@ -381,7 +389,7 @@
 
     </script>
     <!-- ESRI -->
-    <script type="text/javascript" src="//js.arcgis.com/4.10/"></script>
+    <script type="text/javascript" src="//js.arcgis.com/4.11/"></script>
     <script type="text/javascript">
         require([
             'app/settings',
