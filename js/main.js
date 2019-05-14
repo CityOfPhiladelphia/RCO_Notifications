@@ -654,7 +654,7 @@ define([
                 pwdQuery.geometry = geom;
                 blockQuery.where = "TENCODE LIKE '" + block + "__'";
                 pwdQuery.returnGeometry = blockQuery.returnGeometry = true;
-                pwdQuery.outFields = blockQuery.outFields = ["BRT_ID"];
+                pwdQuery.outFields = blockQuery.outFields = ["ADDRESS,BRT_ID", "NUM_ACCOUNTS"];
                 pwdQuery.outSpatialReference = this.view.spatialReference;
                 byGeom = pwdQueryTask.execute(pwdQuery);
                 byBlock = blockQueryTask.execute(blockQuery);
@@ -676,7 +676,8 @@ define([
                         var opaQueryTask = new QueryTask({
                             url: this.settings.opaPropertiesUrl
                         });
-                        opaQuery.where =
+
+                        var whereClause =
                             "PARCEL_NUMBER IN (" +
                             results
                                 .map(function (x) {
@@ -684,6 +685,25 @@ define([
                                 })
                                 .join(",") +
                             ")";
+                            
+                        var condos = results.filter(function (i) {
+                            return i.attributes.NUM_ACCOUNTS > 1;
+                        });
+
+                        if (condos.length > 0) {
+                            whereClause +=
+                                " OR LOCATION IN (" +
+                                condos
+                                    .map(function (x) {
+                                        return "'" + x.attributes.ADDRESS + "'";
+                                    })
+                                    .join(",") +
+                                ")";
+                        }
+
+                        opaQuery.where = whereClause;
+
+
                         opaQuery.returnGeometry = false;
                         opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT"];
                         opaQuery.outSpatialReference = this.view.spatialReference;
