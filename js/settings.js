@@ -15,7 +15,7 @@ define({
     "dorParcelsUrl": "//services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/DOR_Parcel/FeatureServer/0",
     "rcoUrl": "//services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Zoning_RCO/FeatureServer/0",
     "councilUrl": "//services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Council_Districts_2016/FeatureServer/0",
-    "opaPropertiesUrl": "//services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/OPA_PROPERTIES_PUBLIC/FeatureServer/0",
+    "cartoOpaPropertiesUrl": "https://phl.carto.com:443/api/v2/sql",
     // FIELDS
     "rcoFields": ["ORGANIZATION_NAME", "PRIMARY_EMAIL", "ORGANIZATION_ADDRESS", "PRIMARY_NAME", "PRIMARY_ADDRESS", "PRIMARY_PHONE"],
     "aisApiUrl" : "//api.phila.gov/ais/v1/",

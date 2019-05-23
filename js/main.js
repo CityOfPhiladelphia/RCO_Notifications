@@ -672,20 +672,18 @@ define([
 
                         this._draw(subject, geom, notifyGeom);
 
-                        var opaQuery = new Query();
-                        var opaQueryTask = new QueryTask({
-                            url: this.settings.opaPropertiesUrl
-                        });
+                        var opaQuery = this.settings.cartoOpaPropertiesUrl 
+                                        + "?q=select PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT from phl.opa_properties_public";
 
                         var whereClause =
-                            "PARCEL_NUMBER IN (" +
+                            " where PARCEL_NUMBER IN (" +
                             results
                                 .map(function (x) {
                                     return "'" + x.attributes.BRT_ID + "'";
                                 })
                                 .join(",") +
                             ")";
-                            
+
                         var condos = results.filter(function (i) {
                             return i.attributes.NUM_ACCOUNTS > 1;
                         });
@@ -701,21 +699,17 @@ define([
                                 ")";
                         }
 
-                        opaQuery.where = whereClause;
+                        opaQuery += whereClause;
 
-
-                        opaQuery.returnGeometry = false;
-                        opaQuery.outFields = ["PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT"];
-                        opaQuery.outSpatialReference = this.view.spatialReference;
-                        opaQueryTask.execute(opaQuery).then(
+                       request(opaQuery).then(
                             lang.hitch(this, function (opaResults) {
-                                this.features = opaResults.features.map(function (feature) {
+                                this.features = JSON.parse(opaResults).rows.map(function (feature) {
                                     return {
                                         attributes: {
-                                            street_address: feature.attributes.LOCATION,
-                                            parcel_number: feature.attributes.PARCEL_NUMBER,
-                                            zip_code: feature.attributes.ZIP_CODE,
-                                            unit: feature.attributes.UNIT
+                                            street_address: feature.location,
+                                            parcel_number: feature.parcel_number,
+                                            zip_code: feature.zip_code,
+                                            unit: feature.unit
                                         }
                                     };
                                 });
