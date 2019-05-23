@@ -88,34 +88,28 @@ define([
             // init app
             _initApp: function _initApp() {
                 this._initSplash();
-
                 this._initMap();
             },
             // ** Splash ** //
             _initSplash: function _initSplash() {
-                var splash = dom.byId("splashScreen");
-                var dontShowCheck = dom.byId("doNotShowSplash");
-                var clickables = cssQuery(".clickable");
 
+                var dontShowCheck = dom.byId("doNotShowSplash");
                 if (cookie("hideSplashByDefault") === "true") {
-                    domStyle.set(splash, "display", "none");
-                    domStyle.set(splash, "z-index", -10);
                     dontShowCheck.checked = true;
                 } else {
-                    domStyle.set(splash, "display", "block");
-                    domStyle.set(splash, "z-index", 10);
+                    $('#splashReveal').foundation('open');
                     dontShowCheck.checked = false;
                 }
-
-                on(splash, "click", function () {
-                    domStyle.set(splash, "display", "none");
-                    domStyle.set(splash, "z-index", -10);
-                });
+                var clickables = cssQuery(".clickable");
                 clickables.forEach(function (clickable) {
-                    on(clickable, "click", function () {
-                        event.stopPropagation();
+                    on(clickable, "click", function (event) {
+                        var eId = event.target.id;
+                        if (eId !== "doNotShowSplash" && eId !== "doNotShowSplashLabel" && eId !== "splashDontShow") {
+                            $('#splashReveal').foundation('close');
+                        }
                     });
                 });
+
                 on(dontShowCheck, "change", function () {
                     if (dontShowCheck.checked) {
                         cookie("hideSplashByDefault", true);
@@ -290,7 +284,7 @@ define([
                     lang.hitch(this, this._searchClear)
                 );
                 on(dom.byId("btnCSV"), "click", lang.hitch(this, this._downloadClick));
-                on(dom.byId("btnAbout"), "click", lang.hitch(this, this._toggleAbout));
+                // on(dom.byId("btnAbout"), "click", lang.hitch(this, this._toggleAbout));
                 on(dom.byId("btnEmail"), "click", lang.hitch(this, this._sendEmail));
                 on(dom.byId("btnDwn"), "click", lang.hitch(this, this._downloadRCO));
             },
@@ -672,8 +666,8 @@ define([
 
                         this._draw(subject, geom, notifyGeom);
 
-                        var opaQuery = this.settings.cartoOpaPropertiesUrl 
-                                        + "?q=select PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT from phl.opa_properties_public";
+                        var opaQuery = this.settings.cartoOpaPropertiesUrl
+                            + "?q=select PARCEL_NUMBER,LOCATION,ZIP_CODE,UNIT from phl.opa_properties_public";
 
                         var whereClause =
                             " where PARCEL_NUMBER IN (" +
@@ -701,7 +695,7 @@ define([
 
                         opaQuery += whereClause;
 
-                       request(opaQuery).then(
+                        request(opaQuery).then(
                             lang.hitch(this, function (opaResults) {
                                 this.features = JSON.parse(opaResults).rows.map(function (feature) {
                                     return {

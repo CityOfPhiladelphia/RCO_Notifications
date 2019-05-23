@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "phila-standards": "^1.0.2"
+    "phila-standards": "^1.2.0"
   },
   "repository": {
     "type": "git",
