@@ -16,7 +16,7 @@
     padding: 3px 3px 3px 3px
 }
 
-#splashReveal{
+#splashReveal {
     width: 100%;
 }
 
@@ -72,12 +72,11 @@ footer.site-footer {
     margin-right: 10px;
 }
 
-.logos {
+.logos {   
     width: 100%;
     height: 100%;
     clear: both;
     vertical-align: bottom;
-    display: table-cell;
 }
 
 img.center {
