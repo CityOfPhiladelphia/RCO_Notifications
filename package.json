@@ -1,10 +1,10 @@
 {
   "name": "rco_notifications",
-  "version": "1.1.3",
+  "version": "1.2.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "phila-standards": "^1.0.2"
+    "phila-standards": "^1.1.1"
   },
   "repository": {
     "type": "git",

@@ -182,8 +182,9 @@
         <div id="panelContent">
 
             <!-- Splash Screen -->
-            <div id="splashScreen">
-                <h2 id="splashHeader">Information (Click To Dismiss)</h2>
+            <div id="splashReveal" class="reveal clickable" data-reveal>
+                <h2 id="splashHeader">Information (Click Anywhere To Dismiss)</h2> 
+
                 <div>
                     The Philadelphia Zoning Code includes provisions to ensure that neighbors of proposed developments
                     are notified and have an opportunity to provide input regarding zoning decisions that may impact
@@ -215,7 +216,7 @@
                     For questions or comments, email <a class="clickable"
                         href="mailto:RCO.Notification@phila.gov">RCO.Notification@phila.gov</a>.
                 </div>
-                <div id="splashDontShow" class="clickable float-right">
+                <div id="splashDontShow" class="float-right">
                     <input id="doNotShowSplash" type="checkbox" />
                     <label id="doNotShowSplashLabel" for="doNotShowSplash">Don't Show Again</label>
                 </div>
@@ -226,7 +227,7 @@
             <div id="panelUI">
                 <div id="panelInner">
                     <div id="panelBox" class="shadow">
-                        <div id="btnAbout">Info</div>
+                        <div id="btnAbout" data-open="splashReveal">Info</div>
                         <div id="boxTitle" class="box">RCO NOTIFICATION FOR ZONING APPLICATIONS</div>
                         <div id="boxNotify">
                             <div id="boxSearch"></div>
@@ -267,14 +268,13 @@
         <div id="full-footer-start" class="philly311">
         </div>
         <div class="fat">
-            <div class="row pvs ptl-mu phm equal-height">
+            <div class="row phm equal-height">
                 <section class="medium-8 columns phm pvm pvn-mu equal">
                     <nav class="take-action">
-                        <ul>
-                            <li class="pvxs"><img class="PCPC-Logo center" src="images/PCPC_Logo.png" alt="PCPC Logo" />
-                            </li>
-                            <li class="pvxs"><img class="center" src="images/DPD_Logo.png" alt="DPD Logo" /><br /></li>
-                        </ul>
+                        <div class="logos">
+                            <img class="PCPC-Logo" src="images/PCPC_Logo.png" alt="PCPC Logo" />
+                            <img class="DPD-Logo" src="images/DPD_Logo.png" alt="DPD Logo" /><br /></li>
+                        </div>
                     </nav>
                 </section>
                 <section class="medium-8 columns phm pll-mu pvm pvn-mu equal">
@@ -357,7 +357,7 @@
         var head = document.getElementsByTagName('head')[0];
         var file;
         var link;
-        var versionNumberNew = 'v1.1.3';
+        var versionNumberNew = 'v1.2.1';
 
         for (i = 0; i < sourceElements.length; i++) {
             var contentTypeIsJs = sourceElements[i].lastIndexOf("js", 0) === 0;

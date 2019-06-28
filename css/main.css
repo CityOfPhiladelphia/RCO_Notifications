@@ -8,26 +8,16 @@
     font-style: normal;
 }
 
-
 /* Splash Screen */
+
 #splashHeader {
     background-color: #2176D2;
     color: #ffffff;
     padding: 3px 3px 3px 3px
 }
 
-#splashScreen {
-    background-color: rgba(255, 255, 255, 0.95);
-    position: absolute;
-    left: 20%;
-    top: 20%;
-    right: 20%;
-    height: auto;
-    width: auto;
-    z-index: 10;
-    padding: 0px 20px 20px 20px;
-    border: solid;
-    display: none;
+#splashReveal {
+    width: 100%;
 }
 
 #splashDontShow {
@@ -43,21 +33,8 @@
     list-style-position: inside;
 }
 
-@media screen and (max-width: 480px) {
-    #splashScreen {
-        width: auto;
-        height: 450px;
-        left: 0;
-        top: 8px;
-        overflow-y: scroll;
-        z-index: 100;
-    }
-}
-
-
-
-
 /* footer override */
+
 .esri-attribution__sources {
     display: none;
 }
@@ -74,16 +51,32 @@ footer.site-footer {
     left: auto !important;
 }
 
-    .dropdown-pane.is-open a {
-        text-align: left !important;
-    }
-
+.dropdown-pane.is-open a {
+    text-align: left !important;
+}
 
 .PCPC-Logo {
-    width: 100px !important;
-    max-width: 100px !important;
+    width: 40px !important;
+    max-width: 30% !important;
     height: auto !important;
-    margin-bottom: 5px !important;
+}
+
+.DPD-Logo {
+    max-width: 70%;
+    height: auto;
+}
+
+.logos img {
+    vertical-align: bottom;
+    bottom: 0;
+    margin-right: 10px;
+}
+
+.logos {   
+    width: 100%;
+    height: 100%;
+    clear: both;
+    vertical-align: bottom;
 }
 
 img.center {
@@ -107,10 +100,10 @@ input:focus {
     height: 32px;
 }
 
-    .esri-search .esri-search__container .esri-widget-button {
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-    }
+.esri-search .esri-search__container .esri-widget-button {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
 
 /* MAP */
 
@@ -119,15 +112,12 @@ input:focus {
         opacity: 0;
         transform: scale(0.00);
     }
-
     1% {
         opacity: 0;
     }
-
     20% {
         opacity: 0.5;
     }
-
     100% {
         opacity: 0;
         transform: scale(7);
@@ -136,10 +126,24 @@ input:focus {
 
 /* UI */
 
+html, body {
+    height: 100%;
+    overflow-y: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#page {
+    flex-grow: 1;
+}
+
 #panelContent {
     position: relative;
     width: 100%;
-    height: 700px;
+    height: 100%;
     display: block;
 }
 
@@ -289,7 +293,6 @@ input:focus {
     margin: 10px auto 10px auto;
 }
 
-
 #btnMax {
     width: 100%;
     height: 30px;
@@ -307,19 +310,15 @@ input:focus {
 }
 
 @media screen and (max-width: 480px) {
-
     #panelContent {
         height: 480px;
     }
-
     #panelBox {
         width: 375px;
     }
-
     #boxTitle {
         height: 40px;
     }
-
     #btnAbout {
         float: right;
         width: 48px;
@@ -335,12 +334,9 @@ input:focus {
         border-radius: 3px;
         cursor: pointer;
     }
-
-
     #boxResults.opened {
         height: 300px;
     }
-
     #boxLabel {
         float: left;
         width: 230px;
@@ -351,6 +347,7 @@ input:focus {
 }
 
 /* Header */
+
 nav ul.horizontal.menu.pan li a {
     font-weight: bold;
 }
