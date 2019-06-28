@@ -1,10 +1,19 @@
 {
   "name": "rco_notifications",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "build": "babel js -d dist --presets minify"
+  },
   "dependencies": {
     "phila-standards": "^1.1.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "babel-preset-minify": "^0.5.0"
   },
   "repository": {
     "type": "git",
