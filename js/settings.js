@@ -7,7 +7,7 @@ define({
     "distance": 250, // buffer distance in feet
     "email": "RCO.Notification@Phila.gov",
     // LOCATOR
-    "locatorUrl": "//gis-utils.phila.gov/arcgis/rest/services/Geocoders/Address_Locator/GeocodeServer",
+    "locatorUrl": "//gis-utils.databridge.phila.gov/arcgis/rest/services/Geocoders/Address_Locator/GeocodeServer",
     //  LABELS
     "labelLayer": "Parcels",
     // LAYERS
