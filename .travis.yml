@@ -3,8 +3,6 @@ node_js:
   - node
 before_install:
   - printf "@fortawesome:registry=https://npm.fontawesome.com/\n//npm.fontawesome.com/:_authToken=${FA_AUTH_TOKEN}" >> ~/.npmrc
-  - npm install -g babel-cli
-  - npm install
   before_deploy:
   - rm -rf node_modules
   deploy:
