@@ -1,11 +1,14 @@
 language: node_js
 node_js:
   - node
+install:
+  - npm install -g babel-cli
+  - npm install
 before_install:
   - printf "@fortawesome:registry=https://npm.fontawesome.com/\n//npm.fontawesome.com/:_authToken=${FA_AUTH_TOKEN}" >> ~/.npmrc
-  before_deploy:
+before_deploy:
   - rm -rf node_modules
-  deploy:
+deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
