@@ -72,7 +72,7 @@ footer.site-footer {
     margin-right: 10px;
 }
 
-.logos {   
+.logos {
     width: 100%;
     height: 100%;
     clear: both;
@@ -137,6 +137,7 @@ body {
 }
 
 #page {
+    height: 60%;
     flex-grow: 1;
 }
 
