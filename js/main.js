@@ -648,7 +648,7 @@ define([
                 pwdQuery.geometry = geom;
                 blockQuery.where = "TENCODE LIKE '" + block + "__'";
                 pwdQuery.returnGeometry = blockQuery.returnGeometry = true;
-                pwdQuery.outFields = blockQuery.outFields = ["ADDRESS,BRT_ID", "NUM_ACCOUNTS"];
+                pwdQuery.outFields = blockQuery.outFields = ["ADDRESS,BRT_ID", "NUM_ACCOUNTS", "NUM_BRT"];
                 pwdQuery.outSpatialReference = this.view.spatialReference;
                 byGeom = pwdQueryTask.execute(pwdQuery);
                 byBlock = blockQueryTask.execute(blockQuery);
@@ -679,9 +679,9 @@ define([
                             ")";
 
                         var condos = results.filter(function (i) {
-                            return i.attributes.NUM_ACCOUNTS > 1;
+                            return i.attributes.NUM_ACCOUNTS > 1 || i.attributes.NUM_BRT > 1;
                         });
-
+                        
                         if (condos.length > 0) {
                             whereClause +=
                                 " OR LOCATION IN (" +
