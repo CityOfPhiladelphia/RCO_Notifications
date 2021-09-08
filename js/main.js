@@ -679,9 +679,9 @@ define([
                             ")";
 
                         var condos = results.filter(function (i) {
-                            return i.attributes.NUM_ACCOUNTS > 1 || i.attributes.NUM_BRT > 1;
+                            return i.attributes.NUM_ACCOUNTS > 1;
                         });
-                        
+
                         if (condos.length > 0) {
                             whereClause +=
                                 " OR LOCATION IN (" +
