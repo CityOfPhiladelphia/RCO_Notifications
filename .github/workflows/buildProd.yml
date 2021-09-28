@@ -1,0 +1,37 @@
+name: Build and deploy to PRODUCTION S3
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: npm i
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Configure FA
+      run: printf "@fortawesome:registry=https://npm.fontawesome.com/\n//npm.fontawesome.com/:_authToken=${FA_AUTH_TOKEN}" >> ~/.npmrc
+    - name: Build Site
+      working-directory: ./
+      run: |
+        npm install
+        npm run build
+    - name: Deploy static site to S3 bucket
+      working-directory: ./dist
+      run: aws s3 sync ./ s3://planning-rco-notification-map-dev --delete
+    - name: Deploy static site to S3 bucket
+      working-directory: ./dist
+      run: aws s3 sync ./ s3://planning-rco-notification-map --delete
+      
