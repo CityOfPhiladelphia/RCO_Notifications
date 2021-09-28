@@ -16,7 +16,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
     - name: Configure FA
-      env:
       run: printf "@fortawesome:registry=https://npm.fontawesome.com/\n//npm.fontawesome.com/:_authToken=${{ secrets.FA_AUTH_TOKEN }}" >> ~/.npmrc
     - name: Build Site
       working-directory: ./
